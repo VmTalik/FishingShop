@@ -1,0 +1,10 @@
+*.log
+*.pot
+*.pyc
+__pycache__/
+venv/
+.idea/
+media
+tmp
+/postgresql/
+.env
