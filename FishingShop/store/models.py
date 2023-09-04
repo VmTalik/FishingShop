@@ -19,7 +19,11 @@ class Customer(AbstractUser):
 
 class RodType(models.Model):
     rod_type_name = models.CharField(max_length=35, unique=True, verbose_name='Тип удилища')
-    rod_type_image = models.ImageField(verbose_name='Фото удилища')
+    rod_type_image = models.ImageField(upload_to='images_rod_type/', verbose_name='Фото удилища')
+
+    class Meta:
+        verbose_name_plural = 'Типы удилищ'
+        verbose_name = 'Тип удилища'
 
 
 class Rod(models.Model):
@@ -30,10 +34,19 @@ class Rod(models.Model):
     rod_weight = models.DecimalField(max_digits=6, decimal_places=3, verbose_name='Масса удилища')
     rod_rings_number = models.SmallIntegerField(verbose_name='Количество колец удилища')
     rod_description = models.TextField(verbose_name='Описание удилища')
-    rod_price = models.IntegerField(verbose_name='Цена удилища')
-    rod_image = models.ImageField(verbose_name='Фото удилища')
-    rod_type_id = models.ForeignKey(RodType, on_delete=models.CASCADE)
-    rod_manufacturer_id = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
+    rod_price = models.IntegerField(verbose_name='Цена удилища в руб.')
+    rod_image = models.ImageField(upload_to='images_rods/', verbose_name='Основное фото удилища')
+    rod_image_add1 = models.ImageField(upload_to='additional_images_rods/', verbose_name='Дополнительное фото удилища',
+                                       blank=True)
+    rod_image_add2 = models.ImageField(upload_to='additional_images_rods/', verbose_name='Дополнительное фото удилища',
+                                       blank=True)
+    rod_type_id = models.ForeignKey(RodType, on_delete=models.CASCADE, verbose_name='Тип удилища')
+    rod_manufacturer_id = models.ForeignKey(Manufacturer, on_delete=models.CASCADE,
+                                            verbose_name='Производитель удилища')
+
+    class Meta:
+        verbose_name_plural = 'Удилища'
+        verbose_name = 'Удилище'
 
 
 class ReelType(models.Model):
