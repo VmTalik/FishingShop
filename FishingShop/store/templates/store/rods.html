@@ -1,0 +1,104 @@
+{% extends "layout/basic.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'polzunok.css' %}">
+<div class="rods">
+    <h3>Удилище</h3>
+</div>
+<div class="rods-wrap product-wrap">
+    <div class="rods-list product-list">
+        {% for rod in current_rods %}
+        <div class="rods-list__item product-list__item">
+            <a href="{% url 'rod' rod_type_id=rod.rod_type_id.pk rod_id=rod.pk %}">
+                <img class="image-rod" src="{{rod.rod_image.url}}">
+                <div class="rods__item-name">{{rod.rod_name}}</div>
+            </a>
+            <div class="rods__item-price product__item-price">Цена:<span>{{rod.rod_price}}</span> руб.</div>
+            <div class="rods__item-manufacturer product__item-manufacturer">Производитель:<span>{{rod.rod_manufacturer_id.manufacturer_name}}</span></div>
+            <div class="rods__item-weight product__item-weight">Масса:<span>{{rod.rod_weight}}</span> гр</div>
+            <div class="rods__item-length product__item-length">Длина:<span>{{rod.rod_length}}</span> см</div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="rods-filter product-filter">
+        <div class="rods-filter__header product-filter__header">Фильтр</div>
+        <div class="rods-filter__price product-filter__label">
+            <p>Цена</p>
+            <div class="price-input">
+                <div class="price-field">
+                    <span>Мин.</span>
+                    <input type="number" class="input-min" value="0">
+                </div>
+                <div class="separator">-</div>
+                <div class="price-field">
+                    <span>Макс.</span>
+                    <input type="number" class="input-max" value="30000">
+                </div>
+            </div>
+            <div class="price-slider slider">
+                <div class="price-progress progress"></div>
+            </div>
+            <div class="price-range-input range-input">
+                <input type="range" class="price-range-min range-min" min="0" max="30000" value="0">
+                <input type="range" class="price-range-max range-max" min="0" max="30000" value="30000">
+            </div>
+        </div>
+            
+        <div class="rods-filter__manufacturer product-filter__manufacturer">
+            <p>Производитель</p>
+            <div class="checkboxes">
+                {% for current_manufacturer_name in current_manufacturer_names %}
+                <label class="manufacturer-label"><input type="checkbox"><span>{{current_manufacturer_name}}</span></label>
+                {% endfor %}
+            </div>
+        
+        </div>
+        
+        <div class="rods-filter__rod_weight product-filter__label ">
+            <p>Масса удилища</p>
+            <div class="weight-input">
+                <div class="weight-field">
+                    <span>Мин.</span>
+                    <input type="number" class="input-min" value="0">
+                </div>
+                <div class="separator">-</div>
+                <div class="weight-field">
+                    <span>Макс.</span>
+                    <input type="number" class="input-max" value="800">
+                </div>
+            </div>
+            <div class="weight-slider slider">
+                <div class="weight-progress progress"></div>
+            </div>
+            <div class="weight-range-input range-input">
+                <input type="range" class="weight-range-min range-min" min="0" max="800" value="0">
+                <input type="range" class="weight-range-max range-max" min="0" max="800" value="800">
+            </div>
+        </div>
+        
+        <div class="rods-filter__rod_length product-filter__label">
+            <p>Длина удилища</p>
+            <div class="length-input">
+                <div class="length-field">
+                    <span>Мин.</span>
+                    <input type="number" class="input-min" value="50">
+                </div>
+                <div class="separator">-</div>
+                <div class="length-field">
+                    <span>Макс.</span>
+                    <input type="number" class="input-max" value="1600">
+                </div>
+            </div>
+            <div class="length-slider slider">
+                <div class="length-progress progress"></div>
+            </div>
+            <div class="length-range-input range-input">
+                <input type="range" class="length-range-min range-min" min="50" max="1600" value="50">
+                <input type="range" class="length-range-max range-max" min="50" max="1600" value="1600">
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'product-filterdop.js' %}"></script>
+{% endblock %}
+</html>

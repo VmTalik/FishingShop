@@ -1,0 +1,41 @@
+{% extends "layout/basic.html" %}
+{% load static %}
+{% block content %}
+
+<div class="rod">
+    <div class="rod-header">
+        <div class="rod-header__item-left">
+            <div class="rod-name">{{current_rod.rod_name}}</div>
+            <div>
+                <img class="image-rod-in" src="{{current_rod.rod_image.url}}">
+            </div>
+            <div class="images-rod-other">
+                {% if current_rod.rod_image_add1 %}
+                <img class="images-rod-other__item" src="{{current_rod.rod_image_add1.url}}">
+                {% endif %}
+                {% if current_rod.rod_image_add2 %}
+                <img class="images-rod-other__item" src="{{current_rod.rod_image_add2.url}}">
+                {% endif %}
+            </div>
+        </div>
+        <div class="rod-header__item-right">
+            <div class="rod-price">Цена: {{current_rod.rod_price}} руб.</div>
+            <button class="add_to_basket">Добавить в корзину</button>
+        </div>
+    </div>
+    <div class="rod-descr">Подробное описание 
+        <div class="rod-descr__in">{{current_rod.rod_description}}</div>
+    </div>
+    <div class="rod-details">Характеристики товара
+        <ul class="rod-details__in">
+            <li>Производитель: {{current_rod.rod_manufacturer_id}}</li>
+            <li>Артикул: {{current_rod.rod_item_number}} </li>
+            <li>Масса удилища: {{current_rod.rod_weight}} гр</li>
+            <li>Длина удилища: {{current_rod.rod_length}} см</li>
+            <li>Длина рукояти удилища: {{current_rod.rod_handle_length}} см </li>
+            <li>Количество колец удилища: {{current_rod.rod_rings_number}} </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+</html>
