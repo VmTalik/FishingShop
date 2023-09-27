@@ -9,6 +9,10 @@ class Manufacturer(models.Model):
     def __str__(self):
         return self.manufacturer_name
 
+    class Meta:
+        verbose_name_plural = 'Производители'
+        verbose_name = 'Производитель'
+
 
 class Customer(AbstractUser):
     send_messages = models.BooleanField(default=True, verbose_name='Высылать оповещения о новых товарах?')
@@ -21,6 +25,9 @@ class RodType(models.Model):
     rod_type_name = models.CharField(max_length=35, unique=True, verbose_name='Тип удилища')
     rod_type_image = models.ImageField(upload_to='images_rod_type/', verbose_name='Фото удилища')
 
+    def __str__(self):
+        return self.rod_type_name
+
     class Meta:
         verbose_name_plural = 'Типы удилищ'
         verbose_name = 'Тип удилища'
@@ -29,9 +36,9 @@ class RodType(models.Model):
 class Rod(models.Model):
     rod_name = models.CharField(max_length=60, unique=True, verbose_name='Название удилища')
     rod_item_number = models.CharField(max_length=35, unique=True, verbose_name='Артикул удилища')
-    rod_length = models.CharField(max_length=35, unique=True, verbose_name='Длина удилища')
-    rod_handle_length = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Длина рукояти удилища')
-    rod_weight = models.DecimalField(max_digits=6, decimal_places=3, verbose_name='Масса удилища')
+    rod_length = models.SmallIntegerField(verbose_name='Длина удилища')
+    rod_handle_length = models.SmallIntegerField(verbose_name='Длина рукояти удилища')
+    rod_weight = models.SmallIntegerField(verbose_name='Масса удилища')
     rod_rings_number = models.SmallIntegerField(verbose_name='Количество колец удилища')
     rod_description = models.TextField(verbose_name='Описание удилища')
     rod_price = models.IntegerField(verbose_name='Цена удилища в руб.')
@@ -44,6 +51,9 @@ class Rod(models.Model):
     rod_manufacturer_id = models.ForeignKey(Manufacturer, on_delete=models.CASCADE,
                                             verbose_name='Производитель удилища')
 
+    def __str__(self):
+        return self.rod_name
+
     class Meta:
         verbose_name_plural = 'Удилища'
         verbose_name = 'Удилище'
@@ -53,6 +63,13 @@ class ReelType(models.Model):
     reel_type_name = models.CharField(max_length=35, unique=True, verbose_name='Тип катушки')
     reel_type_image = models.ImageField(verbose_name='Фото катушки')
 
+    def __str__(self):
+        return self.reel_type_name
+
+    class Meta:
+        verbose_name_plural = 'Типы катушек'
+        verbose_name = 'Тип катушки'
+
 
 class Reel(models.Model):
     reel_name = models.CharField(max_length=60, unique=True, verbose_name='Название катушки')
@@ -61,7 +78,7 @@ class Reel(models.Model):
     reel_gear_ratio = models.SmallIntegerField(verbose_name='Передаточное отношение катушки')
     reel_capaсity = models.CharField(max_length=20, unique=True, verbose_name='Лесоемкость катушки')
     reel_spool_size = models.SmallIntegerField(verbose_name='Размер шпули катушки')
-    reel_weight = models.DecimalField(max_digits=6, decimal_places=3, verbose_name='Масса катушки')
+    reel_weight = models.SmallIntegerField(verbose_name='Масса катушки')
     reel_friction_type = models.CharField(max_length=45, unique=True,
                                           verbose_name='Тип фрикциона')  # сделать поле выбора
     reel_description = models.TextField(verbose_name='Описание катушки')
@@ -69,6 +86,13 @@ class Reel(models.Model):
     reel_image = models.ImageField(verbose_name='Фото катушки')
     reel_type_id = models.ForeignKey(ReelType, on_delete=models.CASCADE)
     reel_manufacturer_id = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.reel_name
+
+    class Meta:
+        verbose_name_plural = 'Катушки'
+        verbose_name = 'Катушка'
 
 
 class Buy(models.Model):
