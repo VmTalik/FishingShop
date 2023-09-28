@@ -1,7 +1,7 @@
 {% extends "layout/basic.html" %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" type="text/css" href="{% static 'polzunok.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/polzunok.css' %}">
 <div class="rods">
     <h3>Удилище</h3>
 </div>
@@ -27,12 +27,12 @@
             <div class="price-input">
                 <div class="price-field">
                     <span>Мин.</span>
-                    <input type="number" class="input-min" value="0">
+                    <input type="number" class="input-min" placeholder="0">
                 </div>
                 <div class="separator">-</div>
                 <div class="price-field">
                     <span>Макс.</span>
-                    <input type="number" class="input-max" value="30000">
+                    <input type="number" class="input-max" placeholder="30000">
                 </div>
             </div>
             <div class="price-slider slider">
@@ -59,12 +59,12 @@
             <div class="weight-input">
                 <div class="weight-field">
                     <span>Мин.</span>
-                    <input type="number" class="input-min" value="0">
+                    <input type="number" class="input-min" placeholder="0">
                 </div>
                 <div class="separator">-</div>
                 <div class="weight-field">
                     <span>Макс.</span>
-                    <input type="number" class="input-max" value="800">
+                    <input type="number" class="input-max" placeholder="800">
                 </div>
             </div>
             <div class="weight-slider slider">
@@ -81,12 +81,12 @@
             <div class="length-input">
                 <div class="length-field">
                     <span>Мин.</span>
-                    <input type="number" class="input-min" value="50">
+                    <input type="number" class="input-min" placeholder="50">
                 </div>
                 <div class="separator">-</div>
                 <div class="length-field">
                     <span>Макс.</span>
-                    <input type="number" class="input-max" value="1600">
+                    <input type="number" class="input-max" placeholder="1600">
                 </div>
             </div>
             <div class="length-slider slider">
@@ -99,6 +99,5 @@
         </div>
     </div>
 </div>
-<script src="{% static 'product-filterdop.js' %}"></script>
+<script type="module" src="{% static 'js/rods/rod-filter.js' %}"></script>
 {% endblock %}
-</html>
