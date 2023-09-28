@@ -1,4 +1,4 @@
-class ProductFilter {
+export default class ProductFilter {
     constructor(productItems, filterList = [], FilterBy, rangeGap = 0, minRangeVal = 0, maxRangeVal = 10 ** 5) {
         this.productItems = productItems; // элементы продукта
         if (filterList != []) {
@@ -196,7 +196,7 @@ class ProductFilter {
         }
     }
 }
-
+/*
 const rodsListItems = document.querySelectorAll('.rods-list__item'); // элементы продукта
 const filterList = ['price', 'weight', 'length', 'manufacturer']; // массив названий фильтров
 
@@ -217,3 +217,4 @@ rodsFilterWeight.runFilter();
 //фильтр удочек по длине (учитывая остальные фильтры)
 const rodsFilterLength = new ProductFilter(rodsListItems, filterList, {rangeFilterBy: 'length'}, 0, 50, 1600);
 rodsFilterLength.runFilter();
+*/
