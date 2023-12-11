@@ -1,0 +1,135 @@
+{% extends "layout/basic.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/polzunok.css' %}">
+<div class="rods">
+    <h3>Удилище!!!!поправить</h3>
+</div>
+<div class="rods-wrap product-wrap">
+    <div class="rods-list product-list">
+        {% for product in current_products_queryset %}
+        <div class="rods-list__item product-list__item">
+            <div>
+                <a href="{{product.get_absolute_url}}">
+                    <img class="image-rod" src="{{product.image.url}}">
+                    <div class="rods__item-name">{{product.name}}</div>
+                </a>
+                <div class="{{product.subcategory.category.category_slug}}__item-price product__item-price">Цена: <span>{{product.price}}</span> руб</div>
+                <div class="rods__item-manufacturer product__item-manufacturer">Производитель:<span>{{product.manufacturer.manufacturer_name}}</span></div>
+                {% for p in product.productparametervalue_set.all%}
+                {% if p.product_param_value_int %}
+                <div class="product__item-{{p.product_param.product_param_slug}}">{{p.product_param}}: <span>{{p.product_param_value_int}}</span> {{p.product_param_measure_unit}}</div>
+                {% endif %}
+                {% if p.product_param_value_str %}
+                <div class="product__item-{{p.product_param.product_param_slug}}">{{p.product_param}}: <span>{{p.product_param_value_str}}</span></div>
+                {% endif %}
+                {% endfor %}
+                <div class="add_to_basket">
+                    <a href="{% url 'basket_add' rod_id=product.pk %}"><button class="add_to_basket">В корзину</button>
+                    </a>
+                </div>
+                <!--<button class="add_to_basket">В корзину</button>-->
+
+                <!--<form action="{% url 'basket_add' rod_id=product.pk %}" method="post">
+                    {{ basket_rod_form }}
+                    {% csrf_token %}
+                    <input type="submit" value="В корзину">
+                </form>-->
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="rods-filter product-filter">
+        <div class="rods-filter__header product-filter__header">Фильтр</div>
+        <div class="rods-filter__price product-filter__label">
+            <p>Цена</p>
+            <div class="price-input product-filter__input">
+                <div class="price-field product-filter__field">
+                    <span>Мин.</span>
+                    <input type="number" class="input-min" placeholder="0">
+                </div>
+                <div class="separator">-</div>
+                <div class="price-field product-filter__field">
+                    <span>Макс.</span>
+                    <input type="number" class="input-max" placeholder="30000">
+                </div>
+            </div>
+            <div class="price-slider slider">
+                <div class="price-progress progress"></div>
+            </div>
+            <div class="price-range-input range-input">
+                <input type="range" class="price-range-min range-min" min="0" max="30000" value="0">
+                <input type="range" class="price-range-max range-max" min="0" max="30000" value="30000">
+            </div>
+        </div>
+
+        <div class="rods-filter__manufacturer product-filter__manufacturer">
+            <p>Производитель</p>
+            <div class="checkboxes">
+                {% for current_manufacturer in current_manufacturers %}
+                <label class="manufacturer-label"><input type="checkbox"><span>{{current_manufacturer}}</span></label>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% for p, p_vals in product_param_str.items %}
+        <div class="rods-filter__{{p.product_param_slug}} product-filter__checkbox">
+            <p class="checkboxName" data-paramcheckbox="{{p.product_param_slug}}">{{p.product_param_name}}</p>
+            <div class="checkboxes">
+                {% for p_val in p_vals %}
+                <label class="{{p.product_param_slug}}-label"><input type="checkbox"><span>{{p_val}}</span></label>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        {% for p, p_vals in product_param_int.items %}
+        <div class="rods-filter__rod_weight product-filter__label">
+            <p class="rangeName" data-paramrange="{{p.product_param_slug}}">{{p.product_param_name}}</p>
+            <div class="{{p.product_param_slug}}-input product-filter__input">
+                <div class="{{p.product_param_slug}}-field product-filter__field">
+                    <span>Мин.</span>
+                    <input type="number" class="input-min" placeholder="{{p_vals.0}}">
+                </div>
+                <div class="separator">-</div>
+                <div class="{{p.product_param_slug}}-field product-filter__field">
+                    <span>Макс.</span>
+                    <input type="number" class="input-max" placeholder="{{p_vals.1}}">
+                </div>
+            </div>
+            <div class="{{p.product_param_slug}}-slider slider">
+                <div class="{{p.product_param_slug}}-progress progress"></div>
+            </div>
+            <div class="{{p.product_param_slug}}-range-input range-input" data-rangeminmax="{{p_vals|join:' '}}">
+                <input type="range" class="{{p.product_param_slug}}-range-min range-min" min="{{p_vals.0}}" max="{{p_vals.1}}" value="{{p_vals.0}}">
+                <input type="range" class="{{p.product_param_slug}}-range-max range-max" min="{{p_vals.0}}" max="{{p_vals.1}}" value="{{p_vals.1}}">
+            </div>
+        </div>
+        {% endfor %}
+<!--
+        <div class="rods-filter__rod_length product-filter__label">
+            <p>Длина удилища</p>
+            <div class="length-input">
+                <div class="length-field">
+                    <span>Мин.</span>
+                    <input type="number" class="input-min" placeholder="50">
+                </div>
+                <div class="separator">-</div>
+                <div class="length-field">
+                    <span>Макс.</span>
+                    <input type="number" class="input-max" placeholder="1600">
+                </div>
+            </div>
+            <div class="length-slider slider">
+                <div class="length-progress progress"></div>
+            </div>
+            <div class="length-range-input range-input">
+                <input type="range" class="length-range-min range-min" min="50" max="1600" value="50">
+                <input type="range" class="length-range-max range-max" min="50" max="1600" value="1600">
+            </div>
+        </div>-->
+    </div>
+</div>
+
+<script type="module" src="{% static 'js/rods/rod-filter.js' %}"></script>
+{% endblock %}

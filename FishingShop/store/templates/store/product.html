@@ -1,0 +1,47 @@
+{% extends "layout/basic.html" %}
+{% load static %}
+{% block content %}
+
+<div class="rod">
+    <div class="rod-header">
+        <div class="rod-header__item-left">
+            <div class="rod-name">{{product.name}}</div>
+            <div>
+                <img class="image-rod-in" src="{{product.image.url}}">
+            </div>
+            <div class="images-rod-other">
+                {% for img in product.additional_product_image.all %}
+                <img class="images-rod-other__item" src="{{img.add_product_image.url}}">
+                {% endfor %}
+            </div>
+        </div>
+        <div class="rod-header__item-right">
+            <div class="rod-price">Цена: {{product.price}} руб</div>
+            <!--<button class="add_to_basket-in">Добавить в корзину</button>-->
+            <form action="{% url 'basket_add' product.id %}" method="post">
+                {{basket_rod_form}}
+                {% csrf_token %}
+                <input type="submit" value="Добавить в корзину">
+            </form>
+        </div>
+    </div>
+    <div class="rod-descr">Подробное описание
+        <div class="rod-descr__in">{{product.description}}</div>
+    </div>
+    <div class="rod-details">Характеристики товара
+        <ul class="rod-details__in">
+            <li>Производитель: {{product.manufacturer}}</li>
+            <li>Артикул: {{product.slug}} </li>
+            {% for p in product.productparametervalue_set.all %}
+                {% if p.product_param_value_int %}
+                <li>{{p.product_param}}: {{p.product_param_value_int}} {{p.product_param_measure_unit}}</li>
+                {% endif %}
+                {% if p.product_param_value_str %}
+                <li>{{p.product_param}}: {{p.product_param_value_str}}</li>
+                {% endif %}
+                {% endfor %}
+
+        </ul>
+    </div>
+</div>
+{% endblock %}

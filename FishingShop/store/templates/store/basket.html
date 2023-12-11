@@ -1,0 +1,60 @@
+{% extends "layout/basic.html" %}
+{% load static %}
+{% block title %}
+Корзина
+{% endblock %}
+{% block content %}
+<h1>Корзина</h1>
+{% if basket.get_total_price != 0 %}
+<table class="basket">
+    <thead>
+        <tr>
+            <th>Фото</th>
+            <th>Название продукта</th>
+            <th>Количество</th>
+            <th>Удалить</th>
+            <th>Цена за штуку, руб.</th>
+            <th>Цена, руб.</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in basket %}
+            {% with product=item.product %}
+            <tr>
+                <td>
+                    <a href="{{ product.get_absolute_url }}">
+                        <img class="basket__product_image" src="{{ product.image.url }}">
+                    </a>
+                </td>
+                <td>{{ product.name }}</td>
+                <td>
+                        <form action="{% url 'basket_update_quantity' rod_id=product.pk %}" method="post">
+                            {% csrf_token %}
+                            {{ item.update_quantity_form.as_p}}
+                            <input type="submit" value="Обновить">
+                        </form>
+                </td>
+                <td><a href="{% url 'basket_remove' product.id%}">Удалить</a></td>
+                <td class="num">{{ item.price }}</td>
+                <td class="num">{{ item.total_price }}</td>
+            </tr>
+            {% endwith %}
+            {% endfor %}
+            <tr class="total">
+                <td colspan="4"></td>
+                <td>Итого к оплате:</td>
+                <td class="num">{{ basket.get_total_price }}</td>
+            </tr>
+            </tbody>
+            </table>
+            <p class="text-right">
+                <a href="#" class="button">Checkout</a>
+            </p>
+            {% else %}
+            <p>Корзина пустая</p>
+            {% endif %}
+            <p>
+                <a href="{% url 'ordering' %}" class="button">Оформить заказ</a>
+            </p>
+
+            {% endblock %}

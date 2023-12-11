@@ -1,0 +1,18 @@
+{% extends "layout/basic.html" %}
+{% load static %}
+{% block content %}
+
+<div class="subcategories">
+    <h3></h3>
+    <div class="subcategories__item">
+        {% for product_subcategory in product_subcategories_queryset %}
+        <!--<a class="subcategories__link" href="{{product_subcategory.get_absolute_url}}">-->
+        <a class="subcategories__link"
+           href="{% url 'products' product_subcategory.category.fishing_season.fishing_season_slug product_subcategory.category.category_slug product_subcategory.subcategory_slug %}">
+            <img class="subcategories__image" src="{{product_subcategory.subcategory_image.url}}">
+            <div class="subcategories__name">{{product_subcategory.subcategory_name}}</div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

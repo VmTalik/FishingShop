@@ -1,0 +1,16 @@
+{% extends "layout/basic.html" %}
+{% load static %}
+{% block content %}
+<h2></h2>
+<div class="catalog">
+    {% for product_category in product_categories_queryset %}
+    <div class="catalog__item">
+        <!--<a class="catalog__link" href="{{product_category.get_absolute_url}}">-->
+        <a class="catalog__link" href="{% url 'product_subcategories' product_category.fishing_season.fishing_season_slug product_category.category_slug %}">
+            <img class="catalog__image" src="{{product_category.category_image.url}}">
+            <div class="catalog__name">{{product_category.category_name}}</div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
