@@ -3,9 +3,14 @@
 {% block content %}
 <h2>Всё для летней рыбалки</h2>
 <div class="catalog-summer">
-    <a class="catalog-summer__item" href="/catalog-summer/rod_type">Удилища</a>
-    <div class="catalog-summer__item">Катушки</div>
-    <div class="catalog-summer__item">Оснастка</div>
-    <div class="catalog-summer__item">Приманки</div>
+    {% for catalog_summer_item in catalog_summer %}
+    <div>
+        <!--<a class="catalog-summer__item" href="/catalog-summer/{{catalog_summer_item.category_slug}}">-->
+        <a class="catalog-summer__item" href="{{catalog_summer_item.get_absolute_url}}">
+        {{catalog_summer_item.category_name}}
+        <img class="image-catalog-summer__item" src="{{catalog_summer_item.category_image.url}}">
+        </a>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

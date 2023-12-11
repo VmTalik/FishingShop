@@ -4,7 +4,11 @@
 
 <div class="manufacturers">
     <h3>Производители</h3>
-    <div class="manufacturers-list"></div>
+    <div class="manufacturers-list">
+        {% for manufacturer in manufacturers_queryset %}
+        <div class="manufacturers__item">{{ manufacturer.manufacturer_name }}</div>
+        {% endfor %}
+    </div>
 </div>
-<script src="static/js/manufacturers.js"></script>
+<!--<script src="static/js/manufacturers.js"></script>-->
 {% endblock %}
