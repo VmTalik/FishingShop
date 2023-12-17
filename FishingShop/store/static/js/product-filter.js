@@ -1,4 +1,4 @@
-export default class ProductFilter {
+class ProductFilter {
     constructor(productItems, filterList = [], FilterBy, rangeGap = 0, minRangeVal = 0, maxRangeVal = 10 ** 5) {
         this.productItems = productItems; // элементы продукта
         if (filterList != []) {
@@ -19,6 +19,7 @@ export default class ProductFilter {
         }
         this.checkboxFilterBy = FilterBy.checkboxFilterBy; // строка, название текущего фильтра чекбокса (manufacture и т.д.)
         if (typeof this.checkboxFilterBy !== 'undefined') {
+            console.log(this.checkboxFilterBy);
             this.checkboxes = document.querySelectorAll(`.${this.checkboxFilterBy}-label input[type=checkbox]`); //чекбоксы
             this.activeCheckboxName = ''; // название активного чекбокса
             this.hideCheckboxName = ''; // название скрытого чекбокса
@@ -39,32 +40,51 @@ export default class ProductFilter {
         this.label.forEach(input => {
             input.addEventListener('input', event => {
                 this.currentMinRangeVal = parseInt(this.label[0].value);
-                this.currentMaxRangeVal = parseInt(this.label[1].value);
-                if (isNaN(this.currentMinRangeVal) || (this.label[0].value[0] === '0')){
+                this.currentMaxRangeVal = parseInt(this.label[1].value);                
+                if (isNaN(this.currentMinRangeVal) || (this.label[0].value[0] == this.minRangeVal)){
                     this.currentMinRangeVal = this.minRangeVal;
                     this.range[0].value = this.minRangeVal;
                     this.label[0].value = '';
                 }
-                if (isNaN(this.currentMaxRangeVal) || (this.label[1].value[0] === '0')){
+                if (isNaN(this.currentMaxRangeVal) || (this.label[1].value[0] == this.maxRangeVal)){
                     this.currentMaxRangeVal = this.maxRangeVal;
                     this.range[1].value = this.maxRangeVal;
                     this.label[1].value = '';
                 }
-                if ((this.currentMaxRangeVal - this.currentMinRangeVal >= this.rangeGap) && this.currentMinRangeVal >= 0 ) {
+                //Если текущее вводимое значение левое (min) больше чем верхняя граница диапазона 
+                if (this.currentMinRangeVal > this.maxRangeVal) {
+                    this.currentMinRangeVal = this.minRangeVal;
+                    this.range[0].value = this.minRangeVal;
+                    this.label[0].value = '';
+                }
+                //Если текущее вводимое значение левое (min) меньше чем нижняя граница диапазона 
+                if (this.currentMinRangeVal < this.minRangeVal) {
+                    this.currentMinRangeVal = this.minRangeVal;
+                    this.range[0].value = this.minRangeVal;
+                    
+                }
+                if ((this.currentMaxRangeVal - this.currentMinRangeVal >= this.rangeGap)) {
                     if (this.currentMaxRangeVal > this.maxRangeVal) {
                         this.currentMaxRangeVal = this.maxRangeVal;
-                        this.label[1].value = this.maxRangeVal;
+                        this.label[1].value = '';
                     }
+                    
                     this.range[0].value = this.currentMinRangeVal;
-                    this.progress.style.left = (this.currentMinRangeVal / this.range[0].max) * 100 + '%';
-                    this.progress.style.right = 100 - (this.currentMaxRangeVal / this.range[1].max) * 100 + '%';
+                    this.progress.style.left = ((this.currentMinRangeVal - this.range[0].min) / (this.range[0].max - this.range[0].min)) * 100 + '%';
+                    this.progress.style.right = 100 - ((this.currentMaxRangeVal - this.range[1].min) / (this.range[1].max - this.range[1].min)) * 100 + '%';
                     this.range[1].value = this.currentMaxRangeVal;
                     this.checkRange();
                 }
                 else if (this.currentMinRangeVal > this.currentMaxRangeVal){
-                    if (event.target.className === "input-min") {
+                    if (event.target.className === 'input-min') {
+                        if (this.currentMaxRangeVal === this.maxRangeVal){
+                            this.progress.style.left = '100%';
+                            this.progress.style.right = '0%';
+                        }
+                        
                         this.progress.style.left = 100 - parseFloat(this.progress.style.right) + '%';
                         this.range[0].value = this.range[1].value;
+                       
                     } else{
                         this.progress.style.right = 100 - parseFloat(this.progress.style.left) + '%';
                         this.range[1].value = this.range[0].value;
@@ -91,21 +111,21 @@ export default class ProductFilter {
                     if (event.target.className === `${this.rangeFilterBy}-range-min range-min`) {
                         this.range[0].value = this.currentMaxRangeVal - this.rangeGap;
                         this.currentMinRangeVal = this.currentMaxRangeVal - this.rangeGap;
-                        this.progress.style.left = ((this.currentMaxRangeVal - this.rangeGap) / this.range[0].max) * 100 + '%';
+                        this.progress.style.left = ((this.currentMaxRangeVal - this.range[0].min - this.rangeGap) / (this.range[0].max - this.range[0].min)) * 100 + '%';
                         this.label[0].value = this.currentMinRangeVal;
                     } else {
                         this.range[1].value = this.currentMinRangeVal + this.rangeGap;
                         this.currentMaxRangeVal = this.currentMinRangeVal + this.rangeGap;
-                        this.progress.style.right = 100 - ((this.currentMinRangeVal + this.rangeGap) / this.range[1].max) * 100 + '%';
+                        this.progress.style.right = 100 - ((this.currentMinRangeVal - this.range[1].min + this.rangeGap) / (this.range[1].max - this.range[1].min)) * 100 + '%';
                         this.label[1].value = this.currentMaxRangeVal;
                     }
                 } else {
-                    this.progress.style.left = (this.currentMinRangeVal / this.range[0].max) * 100 + '%';
-                    this.progress.style.right = 100 - (this.currentMaxRangeVal / this.range[1].max) * 100 + '%';
+                    this.progress.style.left = ((this.currentMinRangeVal - this.range[0].min) / (this.range[0].max - this.range[0].min)) * 100 + '%';
+                    this.progress.style.right = 100 - ((this.currentMaxRangeVal - this.range[1].min) / (this.range[1].max - this.range[1].min)) * 100 + '%';
                     this.label[0].value = this.currentMinRangeVal;
                     this.label[1].value = this.currentMaxRangeVal;
-                    if (this.currentMinRangeVal === this.minRangeVal) { this.label[0].value = ''; } 
-                    if (this.currentMaxRangeVal === this.maxRangeVal) { this.label[1].value = ''; }
+                    if (this.currentMinRangeVal == this.minRangeVal) { this.label[0].value = ''; } 
+                    if (this.currentMaxRangeVal == this.maxRangeVal) { this.label[1].value = ''; }
                 }
                 this.checkRange();
             });
@@ -130,13 +150,11 @@ export default class ProductFilter {
         this.checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', (event) => {
                 if (event.target.checked) {
-                    console.log('Флажок поставлен');
                     this.activeCheckboxName = checkbox.parentElement.textContent;
                     this.hideCheckboxName = null;
                     this.checkCheckbox();
 
                 } else {
-                    console.log('Флажок убран');
                     this.hideCheckboxName = checkbox.parentElement.textContent;
                     this.activeCheckboxName = null;
                     this.checkCheckbox();
@@ -152,25 +170,21 @@ export default class ProductFilter {
             countProducts += 1;
             const productCheckboxName = item.querySelector(`.product__item-${this.checkboxFilterBy} > span`).textContent;
             if ((this.activeCheckboxName === productCheckboxName)) {
-                console.log('Активен', this.activeCheckboxName);
                 item.classList.add(`active-${this.checkboxFilterBy}`);
                 item.classList.remove(`hide-${this.checkboxFilterBy}`);
             }
             else if ((this.hideCheckboxName === productCheckboxName)) {
-                console.log('Скрыт1', this.hideCheckboxName);
                 item.classList.add(`hide-${this.checkboxFilterBy}`);
                 item.classList.remove(`active-${this.checkboxFilterBy}`);
                 countProductsHide += 1;
             }
             else if ((this.hideCheckboxName !== productCheckboxName) && !item.classList.contains(`active-${this.checkboxFilterBy}`)) {
-                console.log('Скрыт2', this.hideCheckboxName);
                 item.classList.add(`hide-${this.checkboxFilterBy}`);
                 item.classList.remove(`active-${this.checkboxFilterBy}`);
                 countProductsHide += 1;
             }
             this.applyFilter(item);
         });
-        console.log(countProducts, countProductsHide);
         // Если все чекбоксы неактивны, то будем показывать все товары изначальные
         if (countProductsHide === countProducts) {
             this.productItems.forEach(item => {
@@ -196,25 +210,62 @@ export default class ProductFilter {
         }
     }
 }
-/*
-const rodsListItems = document.querySelectorAll('.rods-list__item'); // элементы продукта
-const filterList = ['price', 'weight', 'length', 'manufacturer']; // массив названий фильтров
-
-//фильтр удочек по цене (учитывая остальные фильтры)
-const rodsFilterPrice = new ProductFilter(rodsListItems, filterList, {rangeFilterBy: 'price'}, 0, 0, 30000);
-rodsFilterPrice.runFilter();
-
-//фильтр удочек по производителю (учитывая остальные фильтры)
-const rodsFilterManufacturer = new ProductFilter(rodsListItems, filterList, {checkboxFilterBy: 'manufacturer'});
-rodsFilterManufacturer.runFilter();
 
 
-//фильтр удочек по массе (учитывая остальные фильтры)
-const rodsFilterWeight = new ProductFilter(rodsListItems, filterList, {rangeFilterBy: 'weight'}, 0, 0, 800);
-rodsFilterWeight.runFilter();
+const productListItems = document.querySelectorAll('.products-list__item'); // элементы продукта
+const filterList = ['price', 'manufacturer']; // массив названий фильтров
+
+const paramsCheckboxListItems = document.querySelectorAll('.checkboxName'); // названия чекбосов
+const paramsRangeListItems = document.querySelectorAll('.rangeName'); // названия фильтров диапазонов
 
 
-//фильтр удочек по длине (учитывая остальные фильтры)
-const rodsFilterLength = new ProductFilter(rodsListItems, filterList, {rangeFilterBy: 'length'}, 0, 50, 1600);
-rodsFilterLength.runFilter();
-*/
+//объект дополнительных фильтров диапазона
+let paramsRangeItemObjects = {}
+
+//массив дополнительных фильтров чекбокса
+let paramsCheckboxItemList = []
+
+paramsRangeListItems.forEach(elem => {
+    //Добавляем названия дополнительных фильтров диапазона в массив
+    filterList.push(elem.dataset.paramrange);
+    //Получаем объект дополнительных фильтров диапазона (названия фильтров и соответствующие массивы с min и max параметрами диапазона)
+    paramsRangeItemObjects[elem.dataset.paramrange] = document.querySelector(`.${elem.dataset.paramrange}-range-input`).dataset.rangeminmax.split(' ');
+});
+
+paramsCheckboxListItems.forEach(elem => {
+    //Добавляем названия дополнительных фильтров чекбокса в общий массив фильтров
+    filterList.push(elem.dataset.paramcheckbox);
+    //Добавляем названия дополнительных фильтров чекбокса в массив чекбоксов
+    paramsCheckboxItemList.push(elem.dataset.paramcheckbox);
+});
+
+//фильтр товаров по цене (учитывая остальные фильтры)
+const productFilterPrice = new ProductFilter(productListItems, filterList, { rangeFilterBy: 'price' }, 0, 0, 30000);
+productFilterPrice.runFilter();
+
+//фильтр товаров по производителю (учитывая остальные фильтры)
+const productFilterManufacturer = new ProductFilter(productListItems, filterList, { checkboxFilterBy: 'manufacturer' });
+productFilterManufacturer.runFilter();
+
+
+//дополнительные фильтры диапазона для товаров (учитывая остальные фильтры)
+for (let param in paramsRangeItemObjects) {
+    const productFilter = new ProductFilter(
+        productListItems,
+        filterList,
+        { rangeFilterBy: param },
+        0,
+        paramsRangeItemObjects[param][0],
+        paramsRangeItemObjects[param][1]);
+    productFilter.runFilter();
+}
+
+// дополнительные чекбокс фильтры товаров (учитывая остальные фильтры)
+paramsCheckboxItemList.forEach(param => {
+    const productFilter = new ProductFilter(
+        productListItems,
+        filterList,
+        { checkboxFilterBy: param });
+    productFilter.runFilter();
+
+});
