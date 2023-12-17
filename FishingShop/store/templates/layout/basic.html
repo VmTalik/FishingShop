@@ -8,17 +8,43 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
 <body class="base-wrap">
+    <div class="navbar">
+        <a class="about" href="">О магазине</a>
+        <a class="contacts" href="">Контакты</a>
+        <a class="faq" href="">FAQ</a>
+        {% if user.is_authenticated %}
+        <a class="profile" href="{% url 'profile' %}">Личный кабинет</a>
+        <a class="logout" href="{% url 'logout' %}">Выход</a>
+        {% else %}
+        <a class="login" href="{% url 'login' %}">Вход</a>
+        {% endif %}
+    </div>
     <div class="header">
         <h1>header слева логотип будет</h1>
         <div class="header__logo">
         </div>
     </div>
     <div class="menu">
-        <a class="menu__item" href="/catalog-summer">Летняя рыбалка</a>
-        <div class="menu__item">Зимняя рыбалка</div>
+        {% for fs in fishing_seasons %}
+        <a class="menu__item" href="{{fs.get_absolute_url}}">{{fs.fishing_season_name}}</a>
+        {% endfor %}
         <div class="menu__item">Новости</div>
         <a class="menu__item" href="{% url 'brands' %}">Бренды</a>
-
+        {% if basket|length > 0 %}
+        <a class="menu__basket" href="{% url 'basket_detail' %}">
+            <div class="menu__basket_photo">
+            <img src="{% static 'img/basket6.png'%}">
+                <span>{{ basket|length }}</span>
+            </div>
+            {% if basket|length == 1 %}
+            товар на {{ basket.get_total_price }} руб.
+            {% else %}
+            товаров на {{ basket.get_total_price }} руб.
+            {% endif %}
+        </a>
+        {% else %}
+        <a class="menu__basket" href="{% url 'basket_detail' %}"><img src="{% static 'img/basket6.png'%}">Корзина пуста</a>
+        {% endif %}
     </div>
 
     <div class="content">
