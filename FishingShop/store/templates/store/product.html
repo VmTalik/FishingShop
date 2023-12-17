@@ -2,21 +2,21 @@
 {% load static %}
 {% block content %}
 
-<div class="rod">
-    <div class="rod-header">
-        <div class="rod-header__item-left">
-            <div class="rod-name">{{product.name}}</div>
+<div class="product">
+    <div class="product-header">
+        <div class="product-header__item-left">
+            <div class="product-name">{{product.name}}</div>
             <div>
-                <img class="image-rod-in" src="{{product.image.url}}">
+                <img class="image-product-in" src="{{product.image.url}}">
             </div>
-            <div class="images-rod-other">
+            <div class="images-product-other">
                 {% for img in product.additional_product_image.all %}
-                <img class="images-rod-other__item" src="{{img.add_product_image.url}}">
+                <img class="images-product-other__item" src="{{img.add_product_image.url}}">
                 {% endfor %}
             </div>
         </div>
-        <div class="rod-header__item-right">
-            <div class="rod-price">Цена: {{product.price}} руб</div>
+        <div class="product-header__item-right">
+            <div class="product-price">Цена: {{product.price}} руб</div>
             <!--<button class="add_to_basket-in">Добавить в корзину</button>-->
             <form action="{% url 'basket_add' product.id %}" method="post">
                 {{basket_rod_form}}
@@ -25,11 +25,11 @@
             </form>
         </div>
     </div>
-    <div class="rod-descr">Подробное описание
-        <div class="rod-descr__in">{{product.description}}</div>
+    <div class="product-descr">Подробное описание
+        <div class="product-descr__in">{{product.description}}</div>
     </div>
-    <div class="rod-details">Характеристики товара
-        <ul class="rod-details__in">
+    <div class="product-details">Характеристики товара
+        <ul class="product-details__in">
             <li>Производитель: {{product.manufacturer}}</li>
             <li>Артикул: {{product.slug}} </li>
             {% for p in product.productparametervalue_set.all %}

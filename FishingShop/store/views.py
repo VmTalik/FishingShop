@@ -5,7 +5,7 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.views.decorators.http import require_POST
 from .basket import Basket
-from .forms import BasketAddProductForm, CustomerForm, ChangeCustomerInfoForm, RegisterCustomerForm, BuyForm, \
+from .forms import BasketAddProductForm, RegisterCustomerForm, BuyForm, \
     CustomerBuyForm, CustomerProfileDeliveryForm, CustomerProfileForm
 import sys
 from pympler.asizeof import asizeof
@@ -16,7 +16,8 @@ from django.views.generic import ListView, DetailView
 from django.db.models import Prefetch
 from django.contrib import messages
 from django.contrib.auth import logout
-from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.contrib.auth.views import LoginView, PasswordChangeView, LogoutView, PasswordResetView, \
+    PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
@@ -30,27 +31,18 @@ from .utilities import signer
 def index(request):
     return render(request, 'store/index.html')
 
+
 def manufacturers(request):
     manufacturers_queryset = Manufacturer.objects.all()
     context = {'manufacturers_queryset': manufacturers_queryset}
     return render(request, 'store/manufacturers.html', context)
 
 
-"""
-class ManufacturersView(ListView):
-    model = Manufacturer
-    template_name = 'store/manufacturers.html'
-    context_object_name = 'manufacturers_queryset'
-"""
-
-
-# вместо catalog назвал fishing_season_catalog это по сути категории товаров category
 def product_categories(request, fishing_season_slug):
     # каталог категорий товаров в зависимости от рыболовного сезона
     product_categories_queryset = (
         (Category.objects.filter(fishing_season__fishing_season_slug=fishing_season_slug)
          .select_related('fishing_season')))
-    # first_product_category = product_categories_queryset[0]
     context = {'product_categories_queryset': product_categories_queryset,
                }
     if product_categories_queryset:
@@ -66,32 +58,12 @@ def product_subcategories(request, fishing_season_slug, category_slug):
                                    category__fishing_season__fishing_season_slug=fishing_season_slug)
         .select_related('category')
         .select_related('category__fishing_season'))
-    # first_product_subcategory = product_subcategories_queryset[0]
     context = {'product_subcategories_queryset': product_subcategories_queryset
                }
     if product_subcategories_queryset:
         return render(request, 'store/product_subcategories.html', context)
     else:
         raise Http404('Нет такой страницы с подкатегориями товаров!')
-
-
-"""
-def products(request, fishing_season_slug, category_slug, subcategory_slug):
-    current_products_queryset = (Product.objects.filter(
-        subcategory__subcategory_slug=subcategory_slug,
-        subcategory__category__category_slug=category_slug,
-        subcategory__category__fishing_season__fishing_season_slug=fishing_season_slug)
-                                 .prefetch_related('productparametervalue_set')
-                                 )
-    print(current_products_queryset.query)
-    # for product in current_products_queryset
-    # current_manufacturer_names.add(current_rod.rod_manufacturer_id.manufacturer_name)
-    context = {'current_products_queryset': current_products_queryset}
-    if current_products_queryset:
-        return render(request, 'store/products.html', context)
-    else:
-        raise Http404('Нет такой страницы с товарами!')
-"""
 
 
 class ProductsView(ListView):
@@ -109,9 +81,6 @@ class ProductsView(ListView):
                 .prefetch_related(Prefetch('productparametervalue_set',
                                            queryset=ProductParameterValue.objects.all()
                                            .select_related('product_param', 'product_param_value_str')))
-                # .prefetch_related('productparametervalue_set')
-                # .prefetch_related('productparametervalue_set__product_param_value_str')
-                # .prefetch_related('productparametervalue_set__product_param')
                 )
 
     def get_context_data(self, **kwargs):
@@ -213,7 +182,6 @@ class ProductsView(ListView):
         return context
 
 
-
 """
 class ManufacturerViewSet(ModelViewSet):
     queryset = Manufacturer.objects.all()
@@ -256,17 +224,17 @@ def product(request, fishing_season_slug, category_slug, subcategory_slug, slug)
 """
 
 
-def basket_add(request, rod_id):
+def basket_add(request, product_id):
     basket = Basket(request)
-    product = get_object_or_404(Product, id=rod_id)
+    product = get_object_or_404(Product, id=product_id)
     basket.add(product=product)
     return redirect('basket_detail')
 
 
 @require_POST
-def basket_update_quantity(request, rod_id):
+def basket_update_quantity(request, product_id):
     basket = Basket(request)
-    product = get_object_or_404(Product, id=rod_id)
+    product = get_object_or_404(Product, id=product_id)
     q_choices = [(i, str(i)) for i in range(1, 31)]  # максимальный стартовый выбор количества для всех товаров в козине
     form = BasketAddProductForm(request.POST)
     form.quantity_choices(q_choices)
@@ -297,5 +265,3 @@ def basket_detail(request):
         i['update_quantity_form'] = bf
 
     return render(request, 'store/basket.html', {'basket': basket})
-
-
