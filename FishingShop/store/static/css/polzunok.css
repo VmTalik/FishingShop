@@ -1,20 +1,17 @@
-.price-input, 
-.weight-input, 
-.length-input {
+.product-filter__input {
     display: flex;
     margin: 20px;
 }
 
-.price-input .price-field, 
-.weight-input .weight-field, 
-.length-input .length-field {
+.product-filter__input .product-filter__field {
     display: flex;
     align-items:center;
 }
 
-.price-field input, 
+/*.price-field input,
 .weight-field input, 
-.length-field input {
+.length-field input*/
+.product-filter__field input {
     width: 80px;
     text-align: center;
     outline: none;
@@ -30,9 +27,7 @@ input[type="number"]::-webkit-inner-spin-button{
     -webkit-appearance: none;
 }
 
-.price-input .separator,
-.weight-input .separator,
-.length-input .separator {
+.product-filter__input .separator {
     display: flex;
     width: 15px;
     align-items: center;
