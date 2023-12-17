@@ -1,15 +1,28 @@
 .base-wrap{
     display: grid;
     grid-template-columns: 0.75fr;
+    grid-template-rows: 50px;
     grid-auto-rows: minmax(100px, auto);
     border: 1px solid black;
     grid-template-areas:
+        "nvb"
         "hd "
         "menu"
         "main"
         "ft";
     justify-content: center;
 
+}
+.navbar {
+    display: flex;
+    grid-area: nvb;
+    border: 1px solid black;
+    padding-left: 20%;
+    padding-top: 10px;
+    grid-gap: 20px;
+}
+.login, .profile{
+    padding-left: 50%;
 }
 
 .header {
@@ -32,6 +45,30 @@
     padding: 15px;
     height: fit-content;
     margin: 15px;
+}
+
+.menu__basket {
+    margin-top: 20px;
+    margin-left: 100px;
+    margin-right: -100px;
+}
+
+.menu__basket_photo {
+    position: relative;
+}
+
+.menu__basket_photo > span {
+    display: inline-block;
+    width: 30px;
+    line-height: 30px;
+    position: absolute;
+    color: black;
+    border-radius: 100%;
+    border: 2px #00B344  solid;
+    text-align: center;
+    font-size: 17px;
+    padding: 1px;
+    background-color: #7FFFD4;
 }
 
 .footer {
@@ -64,23 +101,27 @@
     font-size: 18pt;
     padding: 10px;
 }
-
-.catalog-summer{
+/*Категории товаров*/
+.catalog{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-gap: 10px;
     grid-auto-rows: minmax(100px, auto);
     margin: 10px;
 }
-.catalog-summer__item{
+.catalog__item{
     border: 1px solid rgb(228, 80, 11);
     font-family: cursive;
     font-size: 18pt;
     padding: 10px;
 }
+.catalog__image{
+    width: 80%;
+    height: 80%;
+}
 
-/*Типы удилищ*/
-.rod-type-list {
+/*Подкатегории товаров*/
+.subcategories__item {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-gap: 10px;
@@ -88,30 +129,30 @@
     margin: 10px;
 }
 
-.rod-type__item {
+.subcategories__link {
     border: 1px solid rgb(228, 80, 11);
 }
 
 
-.image-rod-type {
+.subcategories__image {
     width: 80%;
     height: 80%;
 }
 
 
-.rod-type-name {
+.subcategories__name {
     margin: 10px;
     font-family: cursive;
     font-weight: bold;
     font-size: 14pt;
 }
 
-/*Удилища*/
-.rods-wrap {
+/*Товары*/
+.products-wrap {
     display: flex;
 }
 
-.rods-list {
+.products-list {
     display: grid;
     flex: 80%;
     height: fit-content;
@@ -122,11 +163,11 @@
 }
 
 
-.rods-list__item {
+.products-list__item {
     border: 1px solid rgb(39, 143, 13);
 }
 
-.image-rod{
+.image-product{
     width: 80%;
     height: 80%;
 }
@@ -161,36 +202,63 @@
     flex-direction: column;
 }
 
+.product-filter__checkbox .checkboxes{
+    display: flex;
+    flex-direction: column;
+}
+
 .manufacturer-label{
     margin-bottom: 8px;
 }
 
-/*
-.rods__item-weight, 
-.product__item-weight,
-.rods__item-length,
-.product__item-length {
-    display: none;
+.add_to_basket{
+    font-size: 12pt;
+    margin-top: 10px;
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #054618;
+    color: #bb6238ea;
+    font-style: italic;
 }
-*/
-/*Подробности удилища*/
-.image-rod-in{
+
+.basket__product_image {
     width: 50%;
     height: 50%;
 }
 
-.images-rod-other{
+.basket {
+    border: 2px solid rgb(228, 80, 11);
+    border-spacing: 45px;
+}
+
+.basket th {
+    text-align: center;
+}
+
+.basket td {
+    text-align: center;
+}
+
+
+/*Подробности товара*/
+.image-product-in{
+    width: 50%;
+    height: 50%;
+}
+
+.images-product-other{
     display: flex;
     flex-wrap: wrap;
 }
 
-.images-rod-other__item{
+.images-product-other__item{
     width: 30%;
     height: 30%;
     padding: 10px;
 }
 
-.rod-header {
+.product-header {
     display: grid;
     grid-template-columns: 3fr 1fr;
     grid-auto-rows: minmax(100px, auto);
@@ -199,12 +267,12 @@
     margin-bottom: 30px;
     
 }
-.rod-header__item-right {
+.product-header__item-right {
     margin-top: 50px;
 }
 
 
-.add_to_basket{
+.add_to_basket-in{
     font-size: 16pt;
     margin-top: 15px;
     padding: 10px;
@@ -216,23 +284,23 @@
     
 }
 
-.rod-descr{
+.product-descr{
     border: 1px solid rgb(228, 80, 11);
     font-size: 16pt;
 }
 
-.rod-descr__in{
+.product-descr__in{
     font-size: 14pt;
     padding: 20px;
 }
 
-.rod-details{
+.product-details{
     border: 1px solid rgb(228, 80, 11);
     font-size: 16pt;
     margin-top: 30px;
 }
 
-.rod-details__in {
+.product-details__in {
     line-height: 1.5;
     font-size: 14pt;
     font-style: italic;
