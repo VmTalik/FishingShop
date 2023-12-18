@@ -19,18 +19,18 @@ from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 from django.conf.urls.static import static
 from django.conf import settings
-from store.views import ManufacturerViewSet, RodTypeViewSet, RodViewSet
+#from store.views import ManufacturerViewSet
 
-router = SimpleRouter()
-router.register(r'api/manufacturers', ManufacturerViewSet)
-router.register(r'api/rod_type', RodTypeViewSet)
-router.register(r'api/rods', RodViewSet)
+#router = SimpleRouter()
+#router.register(r'api/manufacturers', ManufacturerViewSet)
+
 
 urlpatterns = [
+    path("__debug__/", include("debug_toolbar.urls")),
     path('admin/', admin.site.urls),
-    path('', include('store.urls'))
+    path('', include('store.urls')),
 ]
-urlpatterns += router.urls
+#urlpatterns += router.urls
 
 
 if settings.DEBUG:
