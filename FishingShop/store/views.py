@@ -123,7 +123,17 @@ class ProductsView(ListView):
 
         start_time = time.time()
         context['product_param_str'], context['product_param_int'] = {}, {}
+        #задаем начальные минимльную и максимальную цену товара для фильтра
+        context['min_price'] = context['current_products_queryset'][0].price
+        context['max_price'] = context['current_products_queryset'][0].price
         for product in context['current_products_queryset']:
+            #Опеределяем минимльную и максимальную цену товара для фильтра
+            price = product.price
+            if price < context['min_price']:
+                context['min_price'] = price
+            if price > context['max_price']:
+                context['max_price'] = price
+            #Опеределяем остальные параметры для фильтра - список названий чекбоксов, а также min и max параметров диапазона
             for param in product.productparametervalue_set.all():
                 product_param = param.product_param
                 value_int = param.product_param_value_int

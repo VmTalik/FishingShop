@@ -46,20 +46,20 @@
             <div class="price-input product-filter__input">
                 <div class="price-field product-filter__field">
                     <span>Мин.</span>
-                    <input type="number" class="input-min" placeholder="0">
+                    <input type="number" class="input-min" placeholder="{{min_price}}">
                 </div>
                 <div class="separator">-</div>
                 <div class="price-field product-filter__field">
                     <span>Макс.</span>
-                    <input type="number" class="input-max" placeholder="30000">
+                    <input type="number" class="input-max" placeholder="{{max_price}}">
                 </div>
             </div>
             <div class="price-slider slider">
                 <div class="price-progress progress"></div>
             </div>
             <div class="price-range-input range-input">
-                <input type="range" class="price-range-min range-min" min="0" max="30000" value="0">
-                <input type="range" class="price-range-max range-max" min="0" max="30000" value="30000">
+                <input type="range" class="price-range-min range-min" min="{{min_price}}" max="{{max_price}}" value="{{min_price}}">
+                <input type="range" class="price-range-max range-max" min="{{min_price}}" max="{{max_price}}" value="{{max_price}}">
             </div>
         </div>
 

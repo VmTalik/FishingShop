@@ -239,8 +239,12 @@ paramsCheckboxListItems.forEach(elem => {
     paramsCheckboxItemList.push(elem.dataset.paramcheckbox);
 });
 
+//минимальная и максимальная цена товара для фильтра
+const min_price = document.querySelector('.price-range-min').value;
+const max_price = document.querySelector('.price-range-max').value;
+
 //фильтр товаров по цене (учитывая остальные фильтры)
-const productFilterPrice = new ProductFilter(productListItems, filterList, { rangeFilterBy: 'price' }, 0, 0, 30000);
+const productFilterPrice = new ProductFilter(productListItems, filterList, { rangeFilterBy: 'price' }, 0, min_price, max_price);
 productFilterPrice.runFilter();
 
 //фильтр товаров по производителю (учитывая остальные фильтры)
