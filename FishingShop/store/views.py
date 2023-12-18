@@ -275,3 +275,215 @@ def basket_detail(request):
         i['update_quantity_form'] = bf
 
     return render(request, 'store/basket.html', {'basket': basket})
+
+
+def ordering(request):
+    """Функция представление для формирования заказа клиентом"""
+    user_id = request.user.pk
+    customer_initial = Customer.objects.get(pk=user_id)
+    if request.method == "POST":
+        buy_form = BuyForm(request.POST)
+        customer_form = CustomerBuyForm(request.POST, instance=customer_initial)
+        if buy_form.is_valid() and customer_form.is_valid():
+            basket = Basket(request)
+            customer = customer_form.save(commit=False)
+            customer.username = customer_initial.username
+            customer.save()
+
+            buy = buy_form.save(commit=False)
+            buy.customer_id = customer.pk  # эту строку попробовать заменить на buy.customer_id = customer
+            buy.save()
+            step = Step()
+            if not Step.objects.get(step_name='Заказ создан'):
+                step.step_name = 'Заказ создан'
+                step.save()
+            step = Step.objects.get(step_name='Заказ создан')
+
+            BuyStep.objects.create(buy_id=buy.pk,
+                                   step_id=step.pk)
+            for item in basket:
+                BuyProduct.objects.create(product_buy_id=buy.pk,
+                                          product_id=item['product'].pk,
+                                          product_amount=item['quantity'],
+                                          product_price=item['price'])
+            return redirect('successful_ordering')
+    else:
+        buy_form = BuyForm()
+        customer_form = CustomerBuyForm(instance=customer_initial)
+
+    return render(request,
+                  'store/ordering.html',
+                  {'buy_form': buy_form, 'customer_form': customer_form})
+
+
+def successful_ordering(request):
+    basket = Basket(request)
+    basket.clear()
+    return render(request, 'store/successful_ordering.html')
+
+
+@login_required
+def profile(request):
+    """Функция представление - личный кабинет клиента"""
+    customer = request.user
+    products_buy = (Buy.objects.filter(customer=customer)
+                    .prefetch_related('buyproduct_set')
+                    .prefetch_related(Prefetch('buystep_set',
+                                               queryset=BuyStep.objects.select_related('step')
+                                               .order_by('-step_begin_date'))))
+    orders = {}
+    for buy in products_buy:
+        products_count = 0
+        products_price = 0
+        for product in buy.buyproduct_set.all():
+            products_count += product.product_amount
+            products_price += product.product_price * product.product_amount
+        orders[buy] = (products_count, products_price)
+
+    profile_delivery_form = CustomerProfileDeliveryForm
+    return render(request, 'store/profile.html',
+                  {
+                      'customer': customer,
+                      'profile_delivery_form': profile_delivery_form,
+                      'orders': orders
+                  })
+
+
+def order_tracking(request, buy_id):
+    """Функция представление - трек ослеживания доставки в личном кабинете клиента"""
+    products_bought = (BuyProduct.objects.filter(product_buy=buy_id)
+                       .select_related('product__subcategory__category__fishing_season')
+                       )
+    buy_steps = BuyStep.objects.filter(buy=buy_id).order_by('-step_begin_date').select_related('step')
+    total_products_price = 0
+    for product in products_bought:
+        total_products_price += product.product_price * product.product_amount
+
+    return render(request, 'store/order_tracking.html',
+                  {'products_bought': products_bought,
+                   'buy_steps': buy_steps, 'buy_id': buy_id,
+                   'total_products_price': total_products_price})
+
+
+@login_required
+def edit_delivery_address_profile(request):
+    """Функция представление - редактирование адреса доставки в личном кабинете клиента"""
+    customer = Customer.objects.get(pk=request.user.pk)
+    if request.method == "POST":
+        delivery_address_profile_form = CustomerProfileDeliveryForm(request.POST, instance=customer)
+        if delivery_address_profile_form.is_valid():
+            delivery_address_profile_form.save()
+            return redirect('profile')
+    else:
+        delivery_address_profile_form = CustomerProfileDeliveryForm(instance=customer)
+    return render(request, 'store/delivery_address_profile.html',
+                  {'delivery_address_profile_form': delivery_address_profile_form})
+
+
+@login_required
+def edit_customer_profile(request):
+    """Функция представление - редактирование личных данных в личном кабинете клиента"""
+    customer = Customer.objects.get(pk=request.user.pk)
+    if request.method == "POST":
+        customer_profile_form = CustomerProfileForm(request.POST, instance=customer)
+        if customer_profile_form.is_valid():
+            customer_profile_form.save()
+            return redirect('profile')
+    else:
+        customer_profile_form = CustomerProfileForm(instance=customer)
+    return render(request, 'store/editing_customer_profile.html',
+                  {'customer_profile_form': customer_profile_form})
+
+
+class CustomerLoginView(LoginView):
+    """Класс представление - вход клиента в личный кабинет """
+    template_name = 'store/login.html'
+
+
+class CustomerLogoutView(LoginRequiredMixin, LogoutView):
+    """Класс представление - выход клиента из личного кабинета """
+    template_name = 'store/logout.html'
+
+
+class ChangeCustomerPasswordView(SuccessMessageMixin, LoginRequiredMixin, PasswordChangeView):
+    """Класс представление - смена пароля клиента """
+    template_name = 'store/password_change.html'
+    success_url = reverse_lazy('profile')
+    success_message = 'Изменение пароля прошло успешно!'
+
+
+class RegisterCustomerView(CreateView):
+    """Класс представление - регистрация клиента"""
+    model = Customer
+    template_name = 'store/register_customer.html'
+    form_class = RegisterCustomerForm
+    success_url = reverse_lazy('register_done')
+
+
+class RegisterDoneView(TemplateView):
+    """Класс представление - вывод сообщения об успешной регистрации"""
+    template_name = 'store/register_done.html'
+
+
+def customer_activate(request, sign):
+    """Функция представление - активация нового пользователя (клиента)"""
+    try:
+        username = signer.unsign(sign)
+    except BadSignature:
+        return render(request, 'store/bad_signature.html')
+    user = get_object_or_404(Customer, username=username)
+    if user.is_activated:
+        template = 'store/customer_is_activated.html'
+    else:
+        template = 'store/activation_done.html'
+        user.is_active = True
+        user.is_activated = True
+        user.save()
+    return render(request, template)
+
+
+class DeleteCustomerAccountView(LoginRequiredMixin, DeleteView):
+    """Класс представление - удаление аккаунта клиента"""
+    model = Customer
+    template_name = 'store/delete_customer.html'
+    success_url = reverse_lazy('index')
+
+    def setup(self, request, *args, **kwargs):
+        self.user_id = request.user.pk
+        return super().setup(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        logout(request)
+        messages.add_message(request, messages.SUCCESS, 'Пользователь успешно удален')
+        return super().post(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        if not queryset:
+            queryset = self.get_queryset()
+        return get_object_or_404(queryset, pk=self.user_id)
+
+
+class ResetCustomerPasswordView(PasswordResetView):
+    """Класс представление - инициализация процедуры сброса пароля. Отправка клиенту письма для сброса пароля"""
+    # form_class = PasswordResetForm
+    template_name = 'email/reset_password.html'
+    subject_template_name = 'email/reset_subject.txt'
+    email_template_name = 'email/reset_email.txt'
+    success_url = reverse_lazy('password_reset_notification')
+
+
+class ResetDoneCustomerPasswordView(PasswordResetDoneView):
+    """Класс представление - вывод уведомления об успешной отправке письма о сбросе пароля """
+    template_name = 'email/email_sent.html'
+
+
+class ResetConfirmCustomerPasswordView(PasswordResetConfirmView):
+    """Класс представление -сброс пароля клиента"""
+    # form_class = SetPasswordForm
+    template_name = 'email/password_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+
+
+class ResetCompleteCustomerPasswordView(PasswordResetCompleteView):
+    """Класс представление - уведомление об успешном сбросе пароля"""
+    template_name = 'email/password_confirmed.html'

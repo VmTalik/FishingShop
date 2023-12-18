@@ -1,0 +1,66 @@
+{% extends "layout/basic.html" %}
+{% load bootstrap5 %}
+{% block title %}Оформление заказа{% endblock %}
+
+{% block content %}
+<h2>Оформление заказа</h2>
+<table class="table-buy">
+  <tbody>
+    <tr>
+      <td>В заказе </td>
+    </tr>
+     <tr>
+      <td >Количество товаров: </td>
+      <td >{{ basket|length }}</td>
+    </tr>
+    <tr>
+      <td>На сумму:</td>
+      <td>{{ basket.get_total_price }} руб.</td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="basket">
+    <thead>
+        <tr>
+            <th>Название продукта</th>
+            <th>Количество</th>
+
+            <th>Цена за штуку, руб.</th>
+            <th>Цена, руб.</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in basket %}
+            {% with product=item.product %}
+            <tr>
+                <td><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></td>
+                <td>{{item.quantity}}</td>
+                <td class="num">{{ item.price }}</td>
+                <td class="num">{{ item.total_price }}</td>
+            </tr>
+            {% endwith %}
+            {% endfor %}
+            <tr class="total">
+                <td colspan="4"></td>
+                <td>Итого к оплате:</td>
+                <td class="num">{{ basket.get_total_price }} руб.</td>
+            </tr>
+            </tbody>
+            </table>
+
+{% if user.is_authenticated %}
+<form action="{% url 'ordering' %}" method="post">
+    {% csrf_token %}
+    {{ buy_form.as_p}}
+    {{ customer_form.as_p }}
+    <input type="submit" value="Оформить заказ">
+</form>
+{% else %}
+<p> Чтобы оформить заказ, необходимо совершить
+    <a href="{% url 'login' %}">вход</a>
+    в личный кабинет
+</p>
+
+{% endif %}
+{% endblock %}

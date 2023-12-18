@@ -306,3 +306,89 @@
     font-style: italic;
 
 }
+
+/*Личный кабинет клиента*/
+
+
+
+.table-customer-delivery {
+  font-size: 14px;
+  background: white;
+  max-width: 70%;
+  width: 60%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table-customer-delivery td {
+  color: #669;
+  padding: 9px 8px;
+  transition: .3s linear;
+  border-bottom: 1px solid #ccc;
+  width: 30%;
+}
+.table-customer-delivery tr:hover td {
+  color: #6699ff;
+}
+
+
+
+.table-orders {
+  font-size: 14px;
+  font-style: italic;
+  background: white;
+  width: 80%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table-orders td {
+  color: #00008B;
+  padding: 9px 8px;
+  transition: .3s linear;
+  border-bottom: 1px solid #ccc;
+
+}
+.table-orders tbody tr:hover{
+  background: #B0E0E6;
+}
+
+.table-orders th{
+  color: #2F4F4F;
+}
+
+.order-tracking{
+border: 2px solid black;
+height: auto;
+width: 600px;
+margin-top: 20px;
+margin-left: 50px;
+}
+
+.order-tracking__circle{
+height: 20px;
+width: 20px;
+border-radius: 50%;
+background-color: green;
+position: relative;
+margin-top: 50px;
+margin-bottom: 50px;
+margin-left: 20px;
+}
+
+.order-tracking__circle span{
+position: absolute;
+left: 30px;
+white-space: nowrap;
+font-style: italic;
+}
+
+.order-tracking__line{
+border-left: 4px solid green;
+position: absolute;
+left: 8px;
+height: 80px;
+}
+
+
+

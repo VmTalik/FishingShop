@@ -1,0 +1,21 @@
+{% extends "layout/basic.html" %}
+
+{% block title %}Личные данные{% endblock %}
+
+{% block content %}
+<h2>Личный кабинет</h2>
+<h3>Редактирование личных данных</h3>
+
+<form action="{% url 'edit_customer_profile' %}" method="post">
+    {% csrf_token %}
+    {{ customer_profile_form.as_p}}
+    <input type="submit" value="Обновить данные">
+</form>
+<div style="margin-top: 50px">
+При желании Вы также можете:
+<ul>
+    <li><a class="password_change" href="{% url 'password_change' %}">Изменить пароль</a></li>
+    <li><a class="delete_account" href="{% url 'delete_account' %}">Удалить аккаунт</a></li>
+</ul>
+</div>
+{% endblock %}

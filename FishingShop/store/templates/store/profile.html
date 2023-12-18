@@ -1,0 +1,66 @@
+{% extends "layout/basic.html" %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<h2>Личный кабинет</h2>
+<p>Здравствуйте, {{user.username}}, добро пожаловать в Ваш личный кабинет!</p>
+<h3>Личные данные</h3>
+<div>
+  <ul>
+    <li>Контактное лицо: {{user.username}} {{user.firstname}} {{user.lastname}} </li>
+    <li>Телефон: </li>
+    <li>Эл.почта: </li>
+  </ul>
+</div>
+<a href="{% url 'edit_customer_profile' %}"><button class="edit_profile">Редактировать</button></a>
+
+<h3>Данные для доставки</h3>
+<table class="table-customer-delivery">
+  <tbody>
+    <tr>
+      <td>Город: </td>
+      <td>{{ customer.city|default:"не заполнено" }}</td>
+    </tr>
+     <tr>
+      <td >Почтовый индекс:</td>
+      <td>{{ customer.postcode|default:"не заполнено" }}</td>
+    </tr>
+    <tr>
+      <td>Регион:</td>
+      <td>{{ customer.region|default:"не заполнено" }}</td>
+    </tr>
+    <tr>
+      <td>Адрес доставки:</td>
+      <td>{{ customer.delivery_address|default:"не заполнено"  }}</td>
+    </tr>
+  </tbody>
+</table>
+<a href="{% url 'edit_delivery_address_profile' %}"><button class="edit_profile">Редактировать</button></a>
+
+
+<h3>Заказы</h3>
+<table class="table-orders">
+    <thead>
+    <tr>
+      <th>Номер заказа </th>
+      <th>Количество товаров, шт.</th>
+      <th>Общая стоимость, руб.</th>
+      <th>Дата оформления</th>
+      <th>Статус заказа</th>
+    </tr>
+    </thead>
+  <tbody>
+    {% for order, values in orders.items %}
+     <tr>
+      <td ><a class="table-orders__link" href="{% url 'order_tracking' order.id %}">{{order.id}}</a></td>
+       <td>{{values.0}}</td>
+       <td>{{values.1}}</td>
+       <td>{{order.buystep_set.all.0.step_begin_date}}</td>
+       <td>{{order.buystep_set.all.0.step}}</td>
+     </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

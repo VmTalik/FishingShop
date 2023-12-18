@@ -1,0 +1,50 @@
+{% extends "layout/basic.html" %}
+
+{% block title %}Отслеживание доставки{% endblock %}
+
+{% block content %}
+<h2>Отслеживание доставки по заказу №{{buy_id}}</h2>
+<table class="basket">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Название продукта</th>
+            <th>Цена, руб.</th>
+            <th>Количество</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for product in products_bought %}
+            <tr>
+                <td>
+                    <a href="{{ product.product.get_absolute_url }}">
+                        <img src="{{ product.product.image.url }}" style="width:30%;height:30%">
+                    </a>
+                </td>
+                <td><a href="{{ product.product.get_absolute_url }}">{{ product.product.name }}</a></td>
+                <td class="num">{{ product.product_price }}</td>
+                <td>{{ product.product_amount }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="total">
+                <td colspan="4"></td>
+                <td>Суммарный чек:</td>
+                <td class="num">{{total_products_price}} руб.</td>
+            </tr>
+            </tbody>
+            </table>
+<div class="order-tracking">
+{% with first_buy_step=buy_steps.last %}
+{% for buy_step in buy_steps %}
+    {% if buy_steps.count == 1 or buy_step == first_buy_step %}
+    <div class="order-tracking__circle"><span>{{buy_step.step.step_name}} - {{buy_step.step_begin_date}}</span></div>
+    {% else %}
+    <div class="order-tracking__circle"><span>{{buy_step.step.step_name}} - {{buy_step.step_begin_date}}</span>
+        <div class="order-tracking__line" ></div>
+    </div>
+    {% endif %}
+{% endfor %}
+{% endwith %}
+</div>
+
+{% endblock %}
