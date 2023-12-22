@@ -1,5 +1,6 @@
 {% extends "layout/basic.html" %}
 {% load static %}
+{% load my_template_filters %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/polzunok.css' %}">
 <div class="products">
@@ -24,6 +25,15 @@
                 <div class="product__item-{{p.product_param.product_param_slug}}">{{p.product_param}}: <span>{{p.product_param_value_str}}</span></div>
                 {% endif %}
                 {% endfor %}
+                <div class="product_ratings">
+                    {% with products_evaluations_values=products_evaluations|get_dict_value:product %}
+                    {% if products_evaluations_values %}
+                    ⭐ {{products_evaluations_values.0}}
+                    <span>&#x1F5E8;</span>
+                    {{products_evaluations_values.1}} {{products_evaluations_values.1|rus_plural:"отзыв, отзыва, отзывов"}}
+                    {% endif %}
+                    {% endwith %}
+                </div>
                 <div class="add_to_basket">
                     <a href="{% url 'basket_add' product_id=product.pk %}"><button class="add_to_basket">В корзину</button>
                     </a>

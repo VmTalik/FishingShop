@@ -226,12 +226,13 @@ class BuyProduct(models.Model):
 
 
 class Comment(models.Model):
+    EVALUATION_CHOICES = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)]
     title = models.CharField(max_length=60, verbose_name='Заголовок комментария')
-    evaluation = models.PositiveSmallIntegerField(verbose_name='Оценка')  # сделать поле выбора
+    evaluation = models.PositiveSmallIntegerField(verbose_name='Оценка', choices=EVALUATION_CHOICES, default=5)
     comment_text = models.CharField(max_length=180, verbose_name='Текст комментария')
-    comment_date = models.DateField(verbose_name='Дата комментария')
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    comment_date = models.DateField(verbose_name='Дата комментария', auto_now_add=True)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True) #null убрать!
 
     def __str__(self):
         return self.title

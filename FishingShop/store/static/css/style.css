@@ -391,4 +391,49 @@ height: 80px;
 }
 
 
+/*Отзывы к товарам */
+.product-comments{
+    margin-top: 50px;
+}
 
+.product-comments__comment{
+    border-top: 1px solid gray;
+}
+
+.product-comments > p{
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.product-comments__comment .comment_signature{
+    font-weight: bold;
+    display: inline-block;
+}
+
+.product-comments__comment .comment_date{
+    font-style: italic;
+    margin-left: 280px;
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
+.product-comments__comment .comment_rating{
+    margin-left: 50px;
+    display: inline-block;
+    font-size: 24px;
+    color: gray;
+}
+
+/*рейтинги к товарам */
+.product_ratings {
+    margin-top: 10px;
+}
+/*оценка к товару */
+.product_evaluation {
+    margin-top: 10px;
+}
+
+.product_evaluation span {
+    margin-left: 15px;
+}

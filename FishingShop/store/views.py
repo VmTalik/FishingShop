@@ -1,12 +1,12 @@
 from store.models import Manufacturer, FishingSeason, Product, ProductParameterValue, Category, SubCategory, Customer, \
-    Step, BuyStep, BuyProduct, Buy
+    Step, BuyStep, BuyProduct, Buy, Comment
 from store.serializers import ManufacturerSerializer, SubCategorySerializer, ProductSerializer
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.views.decorators.http import require_POST
 from .basket import Basket
 from .forms import BasketAddProductForm, RegisterCustomerForm, BuyForm, \
-    CustomerBuyForm, CustomerProfileDeliveryForm, CustomerProfileForm
+    CustomerBuyForm, CustomerProfileDeliveryForm, CustomerProfileForm, CustomerCommentForm
 import sys
 from pympler.asizeof import asizeof
 import time
@@ -81,6 +81,9 @@ class ProductsView(ListView):
                 .prefetch_related(Prefetch('productparametervalue_set',
                                            queryset=ProductParameterValue.objects.all()
                                            .select_related('product_param', 'product_param_value_str')))
+                .prefetch_related(Prefetch('comment_set',
+                                           queryset=Comment.objects.all()
+                                           .select_related('customer')))
                 )
 
     def get_context_data(self, **kwargs):
@@ -123,17 +126,27 @@ class ProductsView(ListView):
 
         start_time = time.time()
         context['product_param_str'], context['product_param_int'] = {}, {}
-        #задаем начальные минимльную и максимальную цену товара для фильтра
+        # задаем начальные минимльную и максимальную цену товара для фильтра
         context['min_price'] = context['current_products_queryset'][0].price
         context['max_price'] = context['current_products_queryset'][0].price
+        context['products_evaluations'] = {}  # оценки товаров (среднее знач. оценок товара и количество оценок)
         for product in context['current_products_queryset']:
-            #Опеределяем минимльную и максимальную цену товара для фильтра
+            product_comments = product.comment_set.all()  # Все отзывы к товару
+            if product_comments:
+                product_evaluations_sum = 0  # сумма оценок товара
+                for product_comment in product_comments:
+                    product_evaluations_sum += product_comment.evaluation
+                evaluation_count = len(product_comments)  # количество оценок товара
+                evaluation_average = round(product_evaluations_sum / evaluation_count, 2)  # средняя оценка товара
+                context['products_evaluations'].update({product: (evaluation_average, evaluation_count)})
+
+            # Опеределяем минимльную и максимальную цену товара для фильтра
             price = product.price
             if price < context['min_price']:
                 context['min_price'] = price
             if price > context['max_price']:
                 context['max_price'] = price
-            #Опеределяем остальные параметры для фильтра - список названий чекбоксов, а также min и max параметров диапазона
+            # Опеределяем остальные параметры для фильтра - список названий чекбоксов, а также min и max параметров диапазона
             for param in product.productparametervalue_set.all():
                 product_param = param.product_param
                 value_int = param.product_param_value_int
@@ -155,12 +168,6 @@ class ProductsView(ListView):
                     if context['product_param_int'][product_param][1] < value_int:
                         context['product_param_int'][product_param][1] = value_int
 
-                    # context['product_param_int'][param_name] = (min_val, max_val)
-                    # context['product_param_int'][param_name].append(param.product_param_value_int)
-                    # min_val = min(context['product_param_int'][param_name])
-                    # max_val = max(context['product_param_int'][param_name])
-
-                    # params_int_dict[param.product_param] = param.product_param_value_int
         end_time = time.time()
         elapsed_time = end_time - start_time
         print('Elapsed time2:', elapsed_time)
@@ -204,6 +211,8 @@ class ProductView(DetailView):
     slug_url_kwarg = 'product_slug'
     context_object_name = 'product'
 
+    # form_class = CustomerCommentForm
+
     def get_queryset(self):
         return (Product.objects.filter(
             slug=self.kwargs['product_slug'],
@@ -219,10 +228,38 @@ class ProductView(DetailView):
                 # .prefetch_related('productparametervalue_set__product_param_value_str')
                 # .prefetch_related('productparametervalue_set__product_param')
                 .prefetch_related('additional_product_image')
+                .prefetch_related(Prefetch('comment_set',
+                                           queryset=Comment.objects.all()
+                                           .select_related('customer')))
                 )
 
-    # def get_object(self, queryset=None):
-    #   return self.get_queryset().get(slug=self.kwargs['product_slug'])
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['user_comment'] = Comment.objects.filter(customer=self.request.user)
+        context['comment_form'] = CustomerCommentForm()
+        evaluation_sum = 0  # сумма оценок товара
+        comments = context['product'].comment_set.all()
+        for comment in comments:
+            evaluation_sum += comment.evaluation
+            if comment.customer == self.request.user:
+                context['user_comment'] = comment  # комментарий теущего пользователя
+        if comments:
+            context['evaluation_count'] = len(comments)
+            context['product_evaluation_average'] = round(evaluation_sum / context['evaluation_count'], 2)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = CustomerCommentForm(request.POST)
+        product = Product.objects.get(slug=self.kwargs['product_slug'])
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.title = 'title'
+            comment.customer = self.request.user
+            comment.product = product
+            comment.save()
+
+        self.object = self.get_object()
+        return self.render_to_response(context=self.get_context_data())
 
 
 """

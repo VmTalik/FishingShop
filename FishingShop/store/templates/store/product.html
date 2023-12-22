@@ -1,11 +1,18 @@
 {% extends "layout/basic.html" %}
 {% load static %}
+{% load my_template_filters %}
 {% block content %}
 
 <div class="product">
     <div class="product-header">
         <div class="product-header__item-left">
             <div class="product-name">{{product.name}}</div>
+            {% if product_evaluation_average %}
+            <div class="product_evaluation">
+                ⭐ {{product_evaluation_average}}
+                <span>&#x1F5E8; {{evaluation_count}} {{evaluation_count|rus_plural:"отзыв, отзыва, отзывов"}}</span>
+            </div>
+            {% endif %}
             <div>
                 <img class="image-product-in" src="{{product.image.url}}">
             </div>
@@ -17,12 +24,7 @@
         </div>
         <div class="product-header__item-right">
             <div class="product-price">Цена: {{product.price}} руб</div>
-            <!--<button class="add_to_basket-in">Добавить в корзину</button>-->
-            <form action="{% url 'basket_add' product.id %}" method="post">
-                {{basket_rod_form}}
-                {% csrf_token %}
-                <input type="submit" value="Добавить в корзину">
-            </form>
+            <a href="{% url 'basket_add' product_id=product.pk %}"><button class="add_to_basket">В корзину</button></a>
         </div>
     </div>
     <div class="product-descr">Подробное описание
@@ -43,5 +45,33 @@
 
         </ul>
     </div>
+    {% if not user_comment %}
+    <div class="product-write_comment">
+        <p>Написать отзыв</p>
+        <form method="post">
+            {{comment_form.as_p}}
+            {% csrf_token %}
+            <input type="submit" value="Отправить">
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="product-comments">
+        {% if product_evaluation_average %}
+        <p>Все отзывы к товару</p>
+        {% for comment in product.comment_set.all %}
+        <div class="product-comments__comment">
+            <p class="comment_signature">{{comment.customer.first_name}}</p>
+            <p class="comment_date">{{comment.comment_date}}</p>
+            <p class="comment_rating" data-comment_rating="{{comment.evaluation}}"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>{{comment.evaluation}}</p>
+            <p class="comment_header">{{comment.title}}</p>
+            <p class="comment_text">{{comment.comment_text}}</p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>Отзывов пока еще нет</p>
+        {% endif %}
+    </div>
 </div>
+<script src="{% static 'js/comment_star_rating.js' %}"></script>
 {% endblock %}

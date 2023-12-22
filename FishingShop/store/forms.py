@@ -83,3 +83,11 @@ class RegisterCustomerForm(forms.ModelForm):
         model = Customer
         fields = ('username', 'email', 'password1', 'password2', 'first_name',
                   'last_name', 'send_messages')
+
+
+class CustomerCommentForm(forms.ModelForm):
+    comment_text = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), label='Текст комментария')
+
+    class Meta:
+        model = Comment
+        exclude = ('title', 'customer', 'product', 'comment_date')
