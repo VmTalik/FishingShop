@@ -328,6 +328,11 @@ def ordering(request):
             customer.save()
 
             buy = buy_form.save(commit=False)
+            buy.delivery_city = customer.city
+            buy.delivery_region = customer.region
+            buy.delivery_address = customer.delivery_address
+            buy.buyer_full_name = f'{customer.last_name} {customer.first_name} {customer.patronymic}'
+            buy.buyer_phone_number = customer.phone_number
             buy.customer_id = customer.pk  # эту строку попробовать заменить на buy.customer_id = customer
             buy.save()
             step = Step()

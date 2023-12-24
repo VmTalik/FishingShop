@@ -16,13 +16,14 @@ class Manufacturer(models.Model):
 
 
 class Customer(AbstractUser):
+    email = models.EmailField(unique=True, verbose_name='Email')
     patronymic = models.CharField(max_length=30, verbose_name='Отчество', null=True, blank=True)
     send_messages = models.BooleanField(default=True, verbose_name='Высылать оповещения о новых товарах?')
     is_activated = models.BooleanField(default=True, db_index=True, verbose_name="Прошел активацию?")
     phone_number = models.CharField(max_length=17, unique=True, verbose_name='Номер телефона', null=True, blank=True)
     city = models.CharField(max_length=25, verbose_name='Город', null=True, blank=True)
     region = models.CharField(max_length=25, verbose_name='Область, край', null=True, blank=True)
-    postcode = models.SmallIntegerField(verbose_name='Почтовый индекс', null=True, blank=True)
+    postcode = models.CharField(max_length=6, verbose_name='Почтовый индекс', null=True, blank=True)
     delivery_address = models.CharField(max_length=150, verbose_name='Адрес доставки', null=True, blank=True)
 
     class Meta(AbstractUser.Meta):
@@ -193,6 +194,12 @@ class ProductParameterValue(models.Model):
 class Buy(models.Model):
     wishes = models.TextField(verbose_name='Пожелания к заказу', null=True, blank=True)
     delivery_date = models.DateField(verbose_name='Желаемая дата доставки', null=True, blank=True)
+    #Потом у полей убрать null, blank !!
+    delivery_city = models.CharField(max_length=25, verbose_name='Город', null=True, blank=True)
+    delivery_region = models.CharField(max_length=25, verbose_name='Область, край', null=True, blank=True)
+    delivery_address = models.CharField(max_length=150, verbose_name='Адрес доставки', null=True, blank=True)
+    buyer_full_name = models.CharField(max_length=50, verbose_name='ФИО покупателя', null=True, blank=True)
+    buyer_phone_number = models.CharField(max_length=17, verbose_name='Номер телефона', null=True, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
 
     class Meta:
@@ -232,7 +239,7 @@ class Comment(models.Model):
     comment_text = models.CharField(max_length=180, verbose_name='Текст комментария')
     comment_date = models.DateField(verbose_name='Дата комментария', auto_now_add=True)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True) #null убрать!
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)  # null убрать!
 
     def __str__(self):
         return self.title

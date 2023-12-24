@@ -5,10 +5,12 @@ from .models import Customer, Buy, Comment
 
 from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
+from django.forms.widgets import NumberInput
 
 
 class BasketAddProductForm(forms.Form):
     """Форма для обновления количества товаров в корзине"""
+
     def quantity_choices(self, choices):
         self.fields['quantity'] = forms.TypedChoiceField(choices=choices, coerce=int, label='')
         self.fields['update'] = forms.BooleanField(required=False, initial=False, widget=forms.HiddenInput)
@@ -16,6 +18,13 @@ class BasketAddProductForm(forms.Form):
 
 class CustomerBuyForm(forms.ModelForm):
     """Форма данных клиента при оформлении заказа"""
+
+    # делаем незаполненные поля формы только для чтения
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            if self.instance.__dict__[field] is not None:
+                self.fields[field].widget.attrs['readonly'] = True
 
     class Meta:
         model = Customer
@@ -41,11 +50,17 @@ class CustomerProfileForm(forms.ModelForm):
 
 
 class BuyForm(forms.ModelForm):
-    """Форма с допольнительными данными при оформлении заказа"""
+    """Форма с дополнительными данными при оформлении заказа"""
+    delivery_date = forms.DateField(widget=NumberInput(attrs={'type': 'date'}),
+                                    label='Желаемая дата доставки',
+                                    required=False)
+    wishes = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}),
+                             label='Пожелания к заказу',
+                             required=False)
 
     class Meta:
         model = Buy
-        fields = ('wishes',)
+        fields = ('wishes', 'delivery_date')
 
 
 class RegisterCustomerForm(forms.ModelForm):
