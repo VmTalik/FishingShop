@@ -6,6 +6,7 @@ from .models import Customer, Buy, Comment
 from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
 from django.forms.widgets import NumberInput
+from django.core import validators
 
 
 class BasketAddProductForm(forms.Form):
@@ -34,6 +35,9 @@ class CustomerBuyForm(forms.ModelForm):
 
 class CustomerProfileDeliveryForm(forms.ModelForm):
     """Форма данных клиента в профиле для доставки """
+    postcode = forms.CharField(validators=[validators.RegexValidator(regex=r'^\d{6}$')],
+                               error_messages={'invalid': 'Ошибка ввода! Почтовый индекс должен состоять из 6-ти цифр'},
+                               label='Почтовый индекс')
 
     class Meta:
         model = Customer
@@ -43,6 +47,9 @@ class CustomerProfileDeliveryForm(forms.ModelForm):
 class CustomerProfileForm(forms.ModelForm):
     """Форма личных данных клиента в профиле"""
     email = forms.EmailField(required=True, label='Электронная почта')
+    phone_number = forms.CharField(
+        validators=[validators.RegexValidator(regex=r'^(\+7|7|8)?(\s|-|\()?[(]?\d{3}[)]?[\s|-]?\d{3}-?\d{2}-?\d{2}$')],
+        error_messages={'invalid': 'Неправильный формат номера телефона!'}, label='Номер телефона')
 
     class Meta:
         model = Customer
