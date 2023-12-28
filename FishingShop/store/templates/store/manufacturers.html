@@ -1,7 +1,10 @@
 {% extends "layout/basic.html" %}
 {% load static %}
+{% block title %}Производители{% endblock %}
 {% block content %}
-
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a> > <a href="{% url 'brands' %}">Бренды</a>
+</p>
 <div class="manufacturers">
     <h3>Производители</h3>
     <div class="manufacturers-list">
@@ -10,5 +13,4 @@
         {% endfor %}
     </div>
 </div>
-<!--<script src="static/js/manufacturers.js"></script>-->
 {% endblock %}

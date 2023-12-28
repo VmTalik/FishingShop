@@ -1,5 +1,8 @@
 {% extends "layout/basic.html" %}
 {% block title %}Оформление заказа{% endblock %}
 {% block content %}
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a>
+</p>
 <p >Ваш заказ успешно оформлен! Отследить процесс доставки можно в Вашем личном кабинете</p>
 {% endblock %}

@@ -3,9 +3,13 @@
 {% block title %}Личные данные{% endblock %}
 
 {% block content %}
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a> >
+    <a href="{% url 'profile' %}">Личный кабинет</a> >
+    <a href="{% url 'edit_customer_profile' %}">Редактирование личных данных</a>
+</p>
 <h2>Личный кабинет</h2>
 <h3>Редактирование личных данных</h3>
-
 <form action="{% url 'edit_customer_profile' %}" method="post">
     {% csrf_token %}
     {{ customer_profile_form.as_p}}

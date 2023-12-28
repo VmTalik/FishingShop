@@ -3,6 +3,11 @@
 {% block title %}Отслеживание доставки{% endblock %}
 
 {% block content %}
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a> >
+    <a href="{% url 'profile' %}">Личный кабинет</a> >
+    <a href="{% url 'order_tracking' buy_id %}">Отслеживание доставки</a>
+</p>
 <h2>Отслеживание доставки по заказу №{{buy_id}}</h2>
 <table class="basket">
     <thead>

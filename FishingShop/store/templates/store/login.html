@@ -1,8 +1,10 @@
 {% extends "layout/basic.html" %}
 {% load bootstrap5 %}
 {% block title %}Вход{% endblock %}
-
 {% block content %}
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a> > <a href="{% url 'login' %}">Вход в личный кабинет</a>
+</p>
 <h2>Вход в личный кабинет</h2>
 {% if user.authenticated %}
 <p>Вы уже выполнили вход! </p>

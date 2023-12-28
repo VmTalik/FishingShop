@@ -1,11 +1,20 @@
 {% extends "layout/basic.html" %}
 {% load static %}
+{% block title %}Товары{% endblock %}
 {% load my_template_filters %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/polzunok.css' %}">
-<div class="products">
-    <h3>Удилище!!!!поправить</h3>
-</div>
+{% with subcategory=current_products_queryset.0.subcategory %}
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a> >
+    <a href="{{subcategory.category.fishing_season.get_absolute_url}}">{{subcategory.category.fishing_season}}</a> >
+    <a href="{{subcategory.category.get_absolute_url}}">{{subcategory.category}}</a> >
+    <a href="{{subcategory.get_absolute_url}}">{{subcategory}}
+        <span class="lowercase_category">{{subcategory.category}}</span>
+    </a>
+</p>
+<h2 class="products_name">{{subcategory}} <span class="lowercase_category">{{subcategory.category}}</span></h2>
+{% endwith %}
 <div class="products-wrap product-wrap">
     <div class="products-list product-list">
         {% for product in current_products_queryset %}

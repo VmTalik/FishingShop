@@ -1,8 +1,19 @@
 {% extends "layout/basic.html" %}
 {% load static %}
+{% block title %}Подробности товара{% endblock %}
 {% load my_template_filters %}
 {% block content %}
-
+{% with subcategory=product.subcategory %}
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a> >
+    <a href="{{subcategory.category.fishing_season.get_absolute_url}}">{{subcategory.category.fishing_season}}</a> >
+    <a href="{{subcategory.category.get_absolute_url}}">{{subcategory.category}}</a> >
+    <a href="{{subcategory.get_absolute_url}}">{{subcategory}}
+        <span class="lowercase_category">{{subcategory.category}}</span>
+    </a> >
+    <a href="{{product.get_absolute_url}}">{{product}}</a>
+</p>
+{% endwith %}
 <div class="product">
     <div class="product-header">
         <div class="product-header__item-left">
@@ -45,7 +56,7 @@
 
         </ul>
     </div>
-    {% if not user_comment %}
+    {% if not user_comment and user.is_authenticated %}
     <div class="product-write_comment">
         <p>Написать отзыв</p>
         <form method="post">

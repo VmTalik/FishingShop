@@ -28,7 +28,6 @@
         {% for fs in fishing_seasons %}
         <a class="menu__item" href="{{fs.get_absolute_url}}">{{fs.fishing_season_name}}</a>
         {% endfor %}
-        <div class="menu__item">Новости</div>
         <a class="menu__item" href="{% url 'brands' %}">Бренды</a>
         {% if basket|length > 0 %}
         <a class="menu__basket" href="{% url 'basket_detail' %}">

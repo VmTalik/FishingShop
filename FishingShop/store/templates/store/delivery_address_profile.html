@@ -3,6 +3,11 @@
 {% block title %}Данные для доставки{% endblock %}
 
 {% block content %}
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a> >
+    <a href="{% url 'profile' %}">Личный кабинет</a> >
+    <a href="{% url 'edit_delivery_address_profile' %}">Редактирование данных для доставки</a>
+</p>
 <h2>Личный кабинет</h2>
 <h3>Редактирование данных для доставки</h3>
 

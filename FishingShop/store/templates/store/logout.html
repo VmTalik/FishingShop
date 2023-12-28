@@ -1,7 +1,9 @@
 {% extends "layout/basic.html" %}
 {% block title %}Выход{% endblock %}
-
 {% block content %}
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a>
+</p>
 <h2>Выход из личного кабинета</h2>
 <p>Вы успешно выполнили выход из личного кабинета </p>
 {% endblock %}

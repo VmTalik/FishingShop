@@ -1,16 +1,20 @@
 {% extends "layout/basic.html" %}
 {% load static %}
+{% block title %}Категории товаров{% endblock %}
 {% block content %}
-<h2></h2>
-<div class="catalog">
+{% with fishing_season=product_categories_queryset.0.fishing_season %}
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a> > <a href="{{fishing_season.get_absolute_url}}">{{fishing_season}}</a>
+</p>
+<h2 class="categories_name">{{fishing_season}}</h2>
+{% endwith %}
+<div class="categories">
     {% for product_category in product_categories_queryset %}
-    <div class="catalog__item">
-        <!--<a class="catalog__link" href="{{product_category.get_absolute_url}}">-->
-        <a class="catalog__link" href="{% url 'product_subcategories' product_category.fishing_season.fishing_season_slug product_category.category_slug %}">
-            <img class="catalog__image" src="{{product_category.category_image.url}}">
-            <div class="catalog__name">{{product_category.category_name}}</div>
+        <a class="categories__link" href="{{product_category.get_absolute_url}}">
+        <!--<a class="catalog__link" href="{% url 'product_subcategories' product_category.fishing_season.fishing_season_slug product_category.category_slug %}">-->
+            <img class="categories__image" src="{{product_category.category_image.url}}">
+            <div class="categories__label">{{product_category.category_name}}</div>
         </a>
-    </div>
     {% endfor %}
 </div>
 {% endblock %}

@@ -2,6 +2,9 @@
 
 {% block title %}Удаление аккаунта{% endblock %}
 {% block content %}
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a> > <a href="{% url 'delete_account' %}">Удаление аккаунта</a>
+</p>
 <h2>Удаление аккаунта</h2>
 <form method="post">
     {% csrf_token %}

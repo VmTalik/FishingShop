@@ -1,59 +1,55 @@
 {% extends "layout/basic.html" %}
 {% load bootstrap5 %}
 {% block title %}Оформление заказа{% endblock %}
-
 {% block content %}
+<p class="pages_route">
+    <a href="{% url 'index' %}">Главная</a> > <a href="{% url 'ordering' %}">Оформление заказа</a>
+</p>
 <h2>Оформление заказа</h2>
-<table class="table-buy">
+<table class="table-ordering_info">
   <tbody>
     <tr>
       <td>В заказе </td>
     </tr>
      <tr>
-      <td >Количество товаров: </td>
-      <td >{{ basket|length }}</td>
+      <td>товаров: </td>
+      <td>{{ basket|length }} шт.</td>
     </tr>
     <tr>
-      <td>На сумму:</td>
+      <td>на сумму:</td>
       <td>{{ basket.get_total_price }} руб.</td>
     </tr>
   </tbody>
 </table>
 
-<table class="basket">
-    <thead>
-        <tr>
-            <th>Название продукта</th>
-            <th>Количество</th>
-
-            <th>Цена за штуку, руб.</th>
-            <th>Цена, руб.</th>
-        </tr>
-    </thead>
+<table class="table-ordering">
     <tbody>
         {% for item in basket %}
             {% with product=item.product %}
             <tr>
-                <td><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></td>
-                <td>{{item.quantity}}</td>
-                <td class="num">{{ item.price }}</td>
-                <td class="num">{{ item.total_price }}</td>
+                <td><a href="{{ product.get_absolute_url }}">
+                        <img class="ordering__product_image" src="{{ product.image.url }}">{{ product.name }}
+                    </a></td>
+                <td class="num"><span>{{ item.price }} руб. x {{item.quantity}}</span> </td>
             </tr>
             {% endwith %}
             {% endfor %}
             <tr class="total">
                 <td colspan="4"></td>
-                <td>Итого к оплате:</td>
-                <td class="num">{{ basket.get_total_price }} руб.</td>
+                <td style="font-size: 18px;" class="num">Итого к оплате: {{ basket.get_total_price }} руб.</td>
+            </tr>
+            <tr>
+                <td colspan="4"></td>
+                <td style="font-size: 12px;">(без учета стоимости доставки)</td>
             </tr>
             </tbody>
             </table>
 
 {% if user.is_authenticated %}
-<form action="{% url 'ordering' %}" method="post">
+<form class="ordering_form" action="{% url 'ordering' %}" method="post">
     {% csrf_token %}
-    {{ buy_form.as_p}}
     {{ customer_form.as_p }}
+    {{ buy_form.as_p}}
     <input type="submit" value="Оформить заказ">
 </form>
 {% else %}
