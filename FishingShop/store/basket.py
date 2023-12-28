@@ -14,13 +14,20 @@ class Basket:
             # если в сессии нет корзины, то создаем пустую корзину
             basket = self.session[settings.BASKET_SESSION_ID] = {}
         self.basket = basket
+        self.product_ids = self.basket.keys()
+        # получение объектов product и добавление их в корзину
+        self.products = (Product.objects.filter(id__in=self.product_ids)
+                         .select_related('subcategory__category__fishing_season'))
 
     def add(self, product, quantity=1, update_quantity=False):
         """Метод добавления товара в корзину или же обновления его количества"""
+        product_quantity = product.quantity
+        if product_quantity > 15:
+            product_quantity = 15 #ограничим количество товара для покупки, не более 15 шт. за одну покупку
         product_id = str(product.id)
         if product_id not in self.basket:
             self.basket[product_id] = {'quantity': 0,
-                                       'quantity_choices': [(i, str(i)) for i in range(1, product.quantity + 1)],
+                                       'quantity_choices': [(i, str(i)) for i in range(1, product_quantity + 1)],
                                        'price': str(product.price)
                                        }
         if update_quantity:
@@ -51,12 +58,8 @@ class Basket:
 
     def __iter__(self):
         """Метод перебора элементов в корзине и получение продуктов из базы данных"""
-        product_ids = self.basket.keys()
-        # получение объектов product и добавление их в корзину
-        products = Product.objects.filter(id__in=product_ids)
-        for product in products:
+        for product in self.products:
             self.basket[str(product.id)]['product'] = product
-
         for item in self.basket.values():
             item['price'] = Decimal(item['price'])
             item['total_price'] = item['price'] * item['quantity']

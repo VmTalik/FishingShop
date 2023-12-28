@@ -455,3 +455,14 @@ height: 80px;
 .product_evaluation span {
     margin-left: 15px;
 }
+
+.already_in_basket{
+    background-color: #D5EEAB;
+    font-size: 12pt;
+    margin-top: 10px;
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #054618;
+    font-style: italic;
+}

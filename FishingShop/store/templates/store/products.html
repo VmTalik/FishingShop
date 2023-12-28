@@ -44,16 +44,16 @@
                     {% endwith %}
                 </div>
                 <div class="add_to_basket">
-                    <a href="{% url 'basket_add' product_id=product.pk %}"><button class="add_to_basket">В корзину</button>
+                    {% if product.pk not in basket_products_ids_list %}
+                    <a href="{% url 'basket_add' product_id=product.pk %}">
+                        <button class="add_to_basket">В корзину</button>
                     </a>
+                    {% else %}
+                    <a href="{% url 'basket_detail' %}">
+                        <button class="already_in_basket">В корзине</button>
+                    </a>
+                    {% endif %}
                 </div>
-                <!--<button class="add_to_basket">В корзину</button>-->
-
-                <!--<form action="{% url 'basket_add' product_id=product.pk %}" method="post">
-                    {{ basket_product_form }}
-                    {% csrf_token %}
-                    <input type="submit" value="В корзину">
-                </form>-->
             </div>
         </div>
         {% endfor %}

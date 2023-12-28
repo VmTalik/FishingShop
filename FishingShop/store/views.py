@@ -89,6 +89,7 @@ class ProductsView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         start_time = time.time()
+        context['basket_products_ids_list'] = list(map(int, Basket(self.request).product_ids))
         context['current_manufacturers'] = {i.manufacturer.manufacturer_name for i in
                                             context['current_products_queryset']}
         end_time = time.time()
@@ -219,7 +220,7 @@ class ProductView(DetailView):
             subcategory__subcategory_slug=self.kwargs['subcategory_slug'],
             subcategory__category__category_slug=self.kwargs['category_slug'],
             subcategory__category__fishing_season__fishing_season_slug=self.kwargs['fishing_season_slug'])
-                # .select_related('subcategory__category__fishing_season')
+                .select_related('subcategory__category__fishing_season')
                 .select_related('manufacturer')
                 .prefetch_related(Prefetch('productparametervalue_set',
                                            queryset=ProductParameterValue.objects.all()
@@ -275,14 +276,14 @@ def basket_add(request, product_id):
     basket = Basket(request)
     product = get_object_or_404(Product, id=product_id)
     basket.add(product=product)
-    return redirect('basket_detail')
+    return redirect(request.META.get('HTTP_REFERER'))
 
 
 @require_POST
 def basket_update_quantity(request, product_id):
     basket = Basket(request)
     product = get_object_or_404(Product, id=product_id)
-    q_choices = [(i, str(i)) for i in range(1, 31)]  # максимальный стартовый выбор количества для всех товаров в козине
+    q_choices = [(i, str(i)) for i in range(1, 16)] # максимальный стартовый выбор количества для всех товаров в корзине
     form = BasketAddProductForm(request.POST)
     form.quantity_choices(q_choices)
 
@@ -316,8 +317,7 @@ def basket_detail(request):
 
 def ordering(request):
     """Функция представление для формирования заказа клиентом"""
-    user_id = request.user.pk
-    customer_initial = Customer.objects.get(pk=user_id)
+    customer_initial = request.user
     if request.method == "POST":
         buy_form = BuyForm(request.POST)
         customer_form = CustomerBuyForm(request.POST, instance=customer_initial)
