@@ -192,7 +192,7 @@ class ProductParameterValue(models.Model):
 
 
 class Buy(models.Model):
-    wishes = models.TextField(verbose_name='Пожелания к заказу', null=True, blank=True)
+    wishes = models.CharField(max_length=100, verbose_name='Пожелания к заказу', null=True, blank=True)
     delivery_date = models.DateField(verbose_name='Желаемая дата доставки', null=True, blank=True)
     #Потом у полей убрать null, blank !!
     delivery_city = models.CharField(max_length=25, verbose_name='Город', null=True, blank=True)

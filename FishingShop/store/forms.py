@@ -24,7 +24,7 @@ class CustomerBuyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields:
-            if self.instance.__dict__[field] is not None:
+            if getattr(self.instance, field) is not None:
                 self.fields[field].widget.attrs['readonly'] = True
 
     class Meta:
@@ -50,10 +50,14 @@ class CustomerProfileForm(forms.ModelForm):
     phone_number = forms.CharField(
         validators=[validators.RegexValidator(regex=r'^(\+7|7|8)?(\s|-|\()?[(]?\d{3}[)]?[\s|-]?\d{3}-?\d{2}-?\d{2}$')],
         error_messages={'invalid': 'Неправильный формат номера телефона!'}, label='Номер телефона')
+    send_messages = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'bool_field_profile_form'}),
+                                       label='Высылать оповещения о новых товарах?',
+                                       required=False)
 
     class Meta:
         model = Customer
         fields = ('username', 'email', 'first_name', 'last_name', 'patronymic', 'phone_number', 'send_messages')
+        help_texts = {'username': None}
 
 
 class BuyForm(forms.ModelForm):
@@ -61,13 +65,13 @@ class BuyForm(forms.ModelForm):
     delivery_date = forms.DateField(widget=NumberInput(attrs={'type': 'date'}),
                                     label='Желаемая дата доставки',
                                     required=False)
-    wishes = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}),
+    wishes = forms.CharField(widget=forms.Textarea(attrs={'rows': 2}),
                              label='Пожелания к заказу',
                              required=False)
 
     class Meta:
         model = Buy
-        fields = ('wishes', 'delivery_date')
+        fields = ('delivery_date', 'wishes')
 
 
 class RegisterCustomerForm(forms.ModelForm):
@@ -76,6 +80,9 @@ class RegisterCustomerForm(forms.ModelForm):
                                 help_text=password_validation.password_validators_help_text_html())
     password2 = forms.CharField(label='Повторно пароль', widget=forms.PasswordInput,
                                 help_text='Введите пароль повторно')
+    send_messages = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'bool_field_register'}),
+                                       label='Высылать оповещения о новых товарах?',
+                                       required=False)
 
     def clean_password1(self):
         password1 = self.cleaned_data['password1']
@@ -105,6 +112,7 @@ class RegisterCustomerForm(forms.ModelForm):
         model = Customer
         fields = ('username', 'email', 'password1', 'password2', 'first_name',
                   'last_name', 'send_messages')
+        help_texts = {'username': None}
 
 
 class CustomerCommentForm(forms.ModelForm):

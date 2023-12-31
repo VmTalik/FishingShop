@@ -466,3 +466,241 @@ height: 80px;
     border: 1px solid #054618;
     font-style: italic;
 }
+
+/* оформление заказа */
+
+.table-ordering_info td {
+    padding-right: 20px;
+}
+
+.table-ordering {
+    width: 70%;
+    margin: 10px;
+}
+
+.table-ordering td {
+    white-space: nowrap;
+}
+
+.ordering__product_image {
+    width: 10%;
+    height: 10%;
+}
+
+/* формы оформления заказа */
+
+.ordering_form {
+    width: 500px;
+    padding: 31px;
+    margin-top: 30px;
+    margin-left: 50px;
+    box-shadow: 0 4px 16px #ccc;
+    border-radius: 12px;
+    font-family: sans-serif;
+}
+
+.ordering_form input {
+    width: 100%;
+    padding-top: 5px;
+    font-size: 16px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    box-shadow: 1px 3px 15px lightblue;
+}
+
+.ordering_form label {
+    font-size: 17px;
+}
+
+.ordering_form input[type="submit"] {
+    margin-top: 18px;
+    margin-left: 80px;
+    width: 60%;
+    background-color: #B0E0E6;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.ordering_form input[type="submit"]:hover {
+    background-color: #87CEFA;
+}
+
+.ordering_form textarea {
+    resize: none;
+    width: 100%;
+    box-shadow: 1px 3px 15px lightblue;
+}
+
+/* форма правки данных пользователя в личном кабинете */
+.edit_customer_profile_form,
+.edit_delivery_address_profile_form {
+    width: 500px;
+    padding: 31px;
+    margin-top: 30px;
+    box-shadow: 0 4px 16px #ccc;
+    border-radius: 12px;
+    font-family: sans-serif;
+}
+
+.edit_customer_profile_form p,
+.edit_delivery_address_profile_form p {
+    display: flex;
+    justify-content: flex-end;
+    margin-left: 20px;
+
+}
+
+.edit_customer_profile_form input,
+.edit_delivery_address_profile_form input {
+    padding-top: 5px;
+    font-size: 16px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    box-shadow: 1px 3px 15px lightblue;
+    margin-right: 20px;
+}
+
+.edit_customer_profile_form label,
+.edit_delivery_address_profile_form label {
+    font-size: 17px;
+    flex: 1;
+    margin-right: 10px;
+}
+
+.edit_customer_profile_form .bool_field_profile_form {
+    margin-right: 80px;
+}
+
+.edit_customer_profile_form input[type="submit"],
+.edit_delivery_address_profile_form input[type="submit"] {
+    margin-top: 18px;
+    margin-left: 100px;
+    width: 60%;
+    background-color: #B0E0E6;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.edit_customer_profile_form input[type="submit"]:hover,
+.edit_delivery_address_profile_form input[type="submit"]:hover {
+    background-color: #87CEFA;
+}
+
+/* Форма входа в личный кабинет пользователя, форма восстановления пароля */
+
+.login_form,
+.reset_password_form {
+    width: 400px;
+    padding: 31px;
+    margin-top: 30px;
+    margin-left: 50px;
+    box-shadow: 0 4px 16px #ccc;
+    border-radius: 12px;
+    font-family: sans-serif;
+}
+
+.login_form input,
+.reset_password_form input{
+    width: 100%;
+    padding-top: 5px;
+    font-size: 16px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    box-shadow: 1px 3px 15px lightblue;
+}
+
+.login_form label,
+.reset_password_form label {
+    font-size: 17px;
+}
+
+.login_form input[type="submit"],
+.reset_password_form input[type="submit"] {
+    margin-top: 18px;
+    margin-left: 80px;
+    width: 60%;
+    background-color: #B0E0E6;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.login_form input[type="submit"]:hover,
+.reset_password_form input[type="submit"]:hover {
+    background-color: #87CEFA;
+}
+
+.login_form textarea {
+    resize: none;
+    width: 100%;
+    box-shadow: 1px 3px 15px lightblue;
+}
+
+.login_other {
+    margin-left: 50px;
+}
+
+.login_other p:nth-child(2) {
+    font-weight: bold;
+}
+
+
+
+
+/* Форма регистрации пользователя */
+
+.register_form {
+    width: 500px;
+    padding: 31px;
+    margin-top: 30px;
+    margin-left: 50px;
+    box-shadow: 0 4px 16px #ccc;
+    border-radius: 12px;
+    font-family: sans-serif;
+}
+
+.register_form p:nth-child(10) {
+    display: flex;
+    justify-content: flex-end;
+    margin-left: 20px;
+}
+
+.register_form input {
+    width: 99%;
+    padding-top: 5px;
+    font-size: 16px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    box-shadow: 1px 3px 15px lightblue;
+    margin-right: 20px;
+    margin-bottom: 5px;
+    flex: 1;
+}
+
+.register_form label {
+    font-size: 17px;
+    flex: 4;
+}
+
+.register_form input[type="submit"] {
+    margin-top: 18px;
+    margin-left: 80px;
+    width: 60%;
+    background-color: #B0E0E6;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.register_form input[type="submit"]:hover {
+    background-color: #87CEFA;
+}
+
+
+.register_form .bool_field_register {
+    background-color: red;
+    margin-right: 10px;
+}
+
+
+
+
+

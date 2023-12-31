@@ -6,9 +6,9 @@
     <a href="{% url 'index' %}">Главная</a> > <a href="{% url 'register' %}">Регистрация</a>
 </p>
 <h2>Регистрация нового пользователя</h2>
-<form method="post">
+<form class="register_form" method="post">
     {% csrf_token %}
-    {% bootstrap_form form layout='horizontal' %}
-    {% buttons submit='Зарегистрироваться' %}{% endbuttons %}
+    {{ form.as_p }}
+    <input type="submit" value="Зарегистрироваться">
 </form>
 {% endblock %}

@@ -9,15 +9,14 @@
 {% if user.authenticated %}
 <p>Вы уже выполнили вход! </p>
 {% else %}
-<form method="post">
+<form class="login_form" method="post">
     {% csrf_token %}
-    {% bootstrap_form form layout='horizontal' %}
-    <input type="hidden" name="next" value="{{next}}">
-    {% buttons submit='Войти' %}
-    {% endbuttons %}
+    {{ form.as_p }}
+    <input type="submit" value="Войти">
 </form>
-<p><a href="{% url 'password_reset' %}">Забыл пароль</a></p><br>
-<a href="{% url 'register' %}">У меня еще нет аккаунта</a>
-
+<div class="login_other">
+    <p><a href="{% url 'password_reset' %}">Забыл пароль</a></p>
+    <p><a href="{% url 'register' %}">У меня еще нет аккаунта</a></p>
+</div>
 {% endif %}
 {% endblock %}
