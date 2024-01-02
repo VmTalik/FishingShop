@@ -1,0 +1,97 @@
+/*Слайдер для главной страницы*/
+
+.main__slider {
+    text-align: center;
+    border: 2px solid rgb(33, 25, 146);
+    position: relative;
+}
+
+.main__slide img {
+    width: 1024px;
+    height: 576px;
+}
+
+.main__slider-inner {
+    display: flex;
+    transition: 0.5s;
+
+}
+
+.main__slider-wrapper {
+    overflow: hidden;
+    border: 2px solid green;
+    width: 1024px;
+    margin-left: 150px;
+}
+
+
+.arrow-left,
+.arrow-right {
+    margin: 20px 8px;
+    border-radius: 50%;
+    border: 1px solid rgb(128, 146, 161);
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+    box-shadow: 0 0 12px 4px #BFE2FF;
+    background: radial-gradient(#fff, #BFE2FF);
+    cursor: pointer;
+    position: absolute;
+}
+
+.arrow-right {
+    right: 150px;
+    top: 250px;
+    z-index: 1;
+    opacity: .2;
+}
+
+.arrow-left {
+    left: 150px;
+    top: 250px;
+    z-index: 1;
+    opacity: .2;
+}
+
+.arrow-left path,
+.arrow-right path {
+    fill: rgba(86, 112, 134, 0.6);
+    stroke-width: 2;
+    stroke: #2e6e99;
+    transition: fill 0.4s ease-out;
+}
+
+.arrow-right {
+    transform: rotate(180deg);
+}
+
+.arrow-left:hover path,
+.arrow-right:hover path {
+    fill: #032149;
+}
+
+.dots {
+    position: absolute;
+    z-index: 1;
+    right: 0;
+    left: 0;
+    bottom: 10px;
+    display: flex;
+    list-style: none;
+    justify-content: center;
+    margin-left: 15%;
+    margin-right: 15%;
+}
+
+.dots li {
+    width: 20px;
+    height: 10px;
+    flex: 0 1 auto;
+    border-radius: 25%;
+    border: 1px solid rgb(81, 119, 148);
+    margin-left: 5px;
+    margin-right: 5px;
+    cursor: pointer;
+    opacity: .4;
+    background-color: #788dc2;
+}

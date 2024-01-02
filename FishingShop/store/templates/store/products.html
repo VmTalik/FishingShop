@@ -3,7 +3,7 @@
 {% block title %}Товары{% endblock %}
 {% load my_template_filters %}
 {% block content %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/polzunok.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/product-filter.css' %}">
 {% with subcategory=current_products_queryset.0.subcategory %}
 <p class="pages_route">
     <a href="{% url 'index' %}">Главная</a> >
