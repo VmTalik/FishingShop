@@ -1,8 +1,12 @@
 {% extends "layout/basic.html" %}
 {% load static %}
 {% block content %}
+<style type="text/css">
+    .content {
+        background-color:rgb(209, 223, 209);
+    }
+</style>
 <link rel="stylesheet" type="text/css" href="{% static 'css/index-slider.css' %}">
-<h2>Это главная страница</h2>
 <div class="main">
     <div class="main__slider">
         <div class="flipping">
@@ -41,6 +45,51 @@
         </div>
         <ol class="dots">
         </ol>
+    </div>
+    <div class="main__new_products">
+        <h2>Новинки</h2>
+        <div class="main__new_products-wrapper">
+            {% for new_product in new_products %}
+            <div class="main__new_product">
+                <a class="main__new_product-link" href="{{new_product.get_absolute_url}}">
+                    <img class="main__new_product-image" src="{{new_product.image.url}}">
+                    <img class="main__new_product-image_label" src="{% static 'img/new_label.png'%}">
+                    <div class="main__new_product-name">{{new_product.name}}</div>
+                </a>
+                <p><span>{{new_product.price}}</span> &#8381;</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="main__popular_products">
+        <h2>Популярные товары</h2>
+        <div class="main__popular_products-wrapper">
+            {% for popular_product in popular_products %}
+            <div class="main__popular_product">
+                <a class="main__popular_product-link" href="{{popular_product.get_absolute_url}}">
+                    <img class="main__popular_product-image" src="{{popular_product.image.url}}">
+                    <img class="main__popular_product-image_label" src="">
+                    <div class="main__popular_product-name">{{popular_product.name}}</div>
+                </a>
+                <p><span>{{popular_product.price}}</span> &#8381;</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="main__about">
+        <h2 class="main__about__header">Рыболовный интернет-магазин «РЫБАЦКАЯ ФОРТУНА»</h2>
+        <p class="main__about-text">
+            Данный сайт рыболовного интернет-магазина является тренировчным проектом.
+            Интернет-магазин еще не открылся, поэтому к Вашему вниманию представлен лишь только
+            приблизительный ассортимент товаров. Здесь можно найти товары для рыбалки как в летний, 
+            так и зимний период. Все товары распределены по сезонам рыбалки, категориям и подкатегориям. 
+            Для поиска товаров по необходимым параметрам предусмотрены фильтры. Выбранные товары можно 
+            помещать в корзину с целью дальнейшего оформления заказа. Оформить заказ имеют возможность 
+            только авторизированные пользователи. Кроме этого, у авторизированного пользователя сайта 
+            есть доступ к своеиму личному кабинету, где можно редактировать личные данные и данные для доставки, 
+            смотреть сведения о всех своих оформленных заказах, а также отслеживать треки доставок и статусы заказов.
+        </p>
     </div>
 </div>
 <script src="{% static 'js/index-slider.js' %}"></script>

@@ -20,9 +20,9 @@
         {% endif %}
     </div>
     <div class="header">
-        <h1>header слева логотип будет</h1>
-        <div class="header__logo">
+        <div class="header__logo"><a href="{% url 'index' %}"><img src="{% static 'img/kand_main_label.png'%}"></a>
         </div>
+        <div class="header__text">Рыболовный интернет-магазин</div>
     </div>
     <div class="menu">
         {% for fs in fishing_seasons %}
@@ -36,9 +36,9 @@
                 <span>{{ basket|length }}</span>
             </div>
             {% if basket|length == 1 %}
-            товар на {{ basket.get_total_price }} руб.
+            товар на {{ basket.get_total_price }} &#8381;
             {% else %}
-            товаров на {{ basket.get_total_price }} руб.
+            товаров на {{ basket.get_total_price }} &#8381;
             {% endif %}
         </a>
         {% else %}
@@ -50,9 +50,10 @@
         {% block content %}
         {% endblock %}
     </div>
-
+    <footer>
     <div class="footer">
-        Футер
+        &copy; Марлян В.О., 2023 &mdash; 2024 Все права защищены.
     </div>
+    </footer>
 </body>
 </html>

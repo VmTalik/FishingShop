@@ -13,7 +13,7 @@ import time
 from django.views.generic.detail import DetailView
 from django.http import Http404
 from django.views.generic import ListView, DetailView
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView, PasswordChangeView, LogoutView, PasswordResetView, \
@@ -29,7 +29,16 @@ from .utilities import signer
 
 
 def index(request):
-    return render(request, 'store/index.html')
+    products = (Product.objects.select_related('subcategory__category__fishing_season')
+                .only('id', 'name', 'slug', 'price', 'image', 'supply_date', 'subcategory',
+                      'subcategory__category__fishing_season__fishing_season_slug',
+                      'subcategory__category__category_slug', 'subcategory__subcategory_slug'))
+    new_products = products.order_by('-supply_date')[:10]
+    popular_products = (products.prefetch_related(Prefetch('comment_set',
+                                                           queryset=Comment.objects.only('product', 'evaluation')))
+                        .annotate(count_comments=Count('comment')).order_by('-count_comments')[:10])
+    context = {'new_products': new_products, 'popular_products': popular_products}
+    return render(request, 'store/index.html', context)
 
 
 def manufacturers(request):
