@@ -1,19 +1,13 @@
-from store.models import Manufacturer, FishingSeason, Product, ProductParameterValue, Category, SubCategory, Customer, \
-    Step, BuyStep, BuyProduct, Buy, Comment
-from store.serializers import ManufacturerSerializer, SubCategorySerializer, ProductSerializer
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
+from store.models import Manufacturer, Product, ProductParameterValue, Category, SubCategory, Customer, Step, BuyStep, \
+    BuyProduct, Buy, Comment
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from .basket import Basket
 from .forms import BasketAddProductForm, RegisterCustomerForm, BuyForm, \
     CustomerBuyForm, CustomerProfileDeliveryForm, CustomerProfileForm, CustomerCommentForm
-import sys
-from pympler.asizeof import asizeof
-import time
-from django.views.generic.detail import DetailView
 from django.http import Http404
 from django.views.generic import ListView, DetailView
-from django.db.models import Prefetch, Count
+from django.db.models import Prefetch, Count, Avg
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView, PasswordChangeView, LogoutView, PasswordResetView, \
@@ -26,6 +20,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.core.signing import BadSignature
 from .utilities import signer
+from django.db.models.functions import Round
 
 
 def index(request):
@@ -33,10 +28,10 @@ def index(request):
                 .only('id', 'name', 'slug', 'price', 'image', 'supply_date', 'subcategory',
                       'subcategory__category__fishing_season__fishing_season_slug',
                       'subcategory__category__category_slug', 'subcategory__subcategory_slug'))
-    new_products = products.order_by('-supply_date')[:10]
-    popular_products = (products.prefetch_related(Prefetch('comment_set',
-                                                           queryset=Comment.objects.only('product', 'evaluation')))
-                        .annotate(count_comments=Count('comment')).order_by('-count_comments')[:10])
+    new_products = products.order_by('-supply_date')[:8]
+    popular_products = (products.prefetch_related(Prefetch('buyproduct_set',
+                                                           queryset=BuyProduct.objects.only('product')))
+                        .annotate(count_buyproduct=Count('buyproduct')).order_by('-count_buyproduct')[:8])
     context = {'new_products': new_products, 'popular_products': popular_products}
     return render(request, 'store/index.html', context)
 
@@ -89,53 +84,26 @@ class ProductsView(ListView):
                 .select_related('manufacturer')
                 .prefetch_related(Prefetch('productparametervalue_set',
                                            queryset=ProductParameterValue.objects.all()
-                                           .select_related('product_param', 'product_param_value_str')))
+                                           .select_related('product_param')
+                                           .order_by('product_param__product_param_name')
+                                           .select_related('product_param_value_str'))
+                                  )
                 .prefetch_related(Prefetch('comment_set',
                                            queryset=Comment.objects.all()
                                            .select_related('customer')))
+                .prefetch_related(Prefetch('buyproduct_set', queryset=BuyProduct.objects.only('product')))
+                .annotate(count_buyproduct=Count('buyproduct', distinct=True))
+                .annotate(count_comments=Count('comment', distinct=True))
+                .annotate(avg_evaluation=Round(Avg('comment__evaluation'), 2))
+                .order_by('-count_buyproduct')
                 )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        start_time = time.time()
         context['basket_products_ids_list'] = list(map(int, Basket(self.request).product_ids))
         context['current_manufacturers'] = {i.manufacturer.manufacturer_name for i in
                                             context['current_products_queryset']}
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print('Elapsed time1:', elapsed_time)
-        """
-        start_time = time.time()
-        context['product_param_str'], context['product_param_int'] = [], []
-        for i in context['current_products_queryset'][0].productparametervalue_set.all():
-            if i.product_param_value_str:
-                context['product_param_str'].append(i)
-            else:
-                context['product_param_int'].append(i)
-
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print('Elapsed time2:', elapsed_time)
-        """
-        # params_int_dict = {}
-        """
-        start_time = time.time()
-        context['product_param_str'], context['product_param_int'] = [], []
-        for product in context['current_products_queryset']:
-            for param in product.productparametervalue_set.all():
-                if param.product_param_value_str:
-                    context['product_param_str'].append(param.product_param_value_str)
-                else:
-                    context['product_param_int'].append({param.product_param.product_param_name: param.product_param_value_int})
-
-                    #params_int_dict[param.product_param] = param.product_param_value_int
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print('Elapsed time2:', elapsed_time)
-        """
-
-        start_time = time.time()
-        context['product_param_str'], context['product_param_int'] = {}, {}
+        context['products_params_str'], context['products_params_min_max'] = {}, {}
         # задаем начальные минимльную и максимальную цену товара для фильтра
         context['min_price'] = context['current_products_queryset'][0].price
         context['max_price'] = context['current_products_queryset'][0].price
@@ -149,79 +117,44 @@ class ProductsView(ListView):
                 evaluation_count = len(product_comments)  # количество оценок товара
                 evaluation_average = round(product_evaluations_sum / evaluation_count, 2)  # средняя оценка товара
                 context['products_evaluations'].update({product: (evaluation_average, evaluation_count)})
-
-            # Опеределяем минимльную и максимальную цену товара для фильтра
+            # Определяем минимльную и максимальную цену товара для фильтра
             price = product.price
             if price < context['min_price']:
                 context['min_price'] = price
             if price > context['max_price']:
                 context['max_price'] = price
-            # Опеределяем остальные параметры для фильтра - список названий чекбоксов, а также min и max параметров диапазона
+            # Остальные параметры для фильтра - список названий чекбоксов, а также min и max параметров диапазона
             for param in product.productparametervalue_set.all():
                 product_param = param.product_param
                 value_int = param.product_param_value_int
+                value_float = param.product_param_value_float
+                param_value = None
+                if value_float:
+                    param_value = int(value_float)
+                elif value_int:
+                    param_value = value_int
                 value_str = param.product_param_value_str
                 param_by_filter = param.product_param_by_filter
-                if product_param not in context['product_param_str'] and value_str and param_by_filter:
-                    context['product_param_str'][product_param] = []
-                if product_param not in context['product_param_int'] and value_int and param_by_filter:
-                    context['product_param_int'][product_param] = [value_int, value_int]
-
+                if product_param not in context['products_params_str'] and value_str and param_by_filter:
+                    context['products_params_str'][product_param] = []
+                if product_param not in context['products_params_min_max'] and param_value and param_by_filter:
+                    context['products_params_min_max'][product_param] = [param_value, param_value]
                 if value_str and param_by_filter and value_str.product_param_value_str not in \
-                        context['product_param_str'][product_param]:
-                    context['product_param_str'][product_param].append(value_str.product_param_value_str)
-                if value_int and param_by_filter:
-                    # value = param.product_param_value_int
-                    # max_val = param.product_param_value_int
-                    if context['product_param_int'][product_param][0] > value_int:
-                        context['product_param_int'][product_param][0] = value_int
-                    if context['product_param_int'][product_param][1] < value_int:
-                        context['product_param_int'][product_param][1] = value_int
-
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print('Elapsed time2:', elapsed_time)
-
-        """
-        start_time = time.time()
-        context['product_param_str'] = [i for i in
-                                        context['current_products_queryset'][0].productparametervalue_set.all()
-                                        if i.product_param_value_str]
-        context['product_param_int'] = [i for i in
-                                        context['current_products_queryset'][0].productparametervalue_set.all()
-                                        if i.product_param_value_int]
-
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print('Elapsed time3:', elapsed_time)
-        """
-
-        print(context['product_param_str'])
-        print(context['product_param_int'])
-        start_time = time.time()
-        context['product_param_filter_str'] = [i.product_param_name for i in context['product_param_str']]
-        context['product_param_filter_int'] = [i.product_param_name for i in context['product_param_int']]
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print('Elapsed time3:', elapsed_time)
-        print(context['product_param_filter_str'])
-        print(context['product_param_filter_int'])
+                        context['products_params_str'][product_param]:
+                    context['products_params_str'][product_param].append(value_str.product_param_value_str)
+                if param_value and param_by_filter:
+                    if context['products_params_min_max'][product_param][0] > param_value:
+                        context['products_params_min_max'][product_param][0] = param_value
+                    if context['products_params_min_max'][product_param][1] < param_value:
+                        context['products_params_min_max'][product_param][1] = param_value
+        context['product_param_filter_str'] = [i.product_param_name for i in context['products_params_str']]
         return context
-
-
-"""
-class ManufacturerViewSet(ModelViewSet):
-    queryset = Manufacturer.objects.all()
-    serializer_class = ManufacturerSerializer
-"""
 
 
 class ProductView(DetailView):
     template_name = 'store/product.html'
     slug_url_kwarg = 'product_slug'
     context_object_name = 'product'
-
-    # form_class = CustomerCommentForm
 
     def get_queryset(self):
         return (Product.objects.filter(
@@ -233,10 +166,10 @@ class ProductView(DetailView):
                 .select_related('manufacturer')
                 .prefetch_related(Prefetch('productparametervalue_set',
                                            queryset=ProductParameterValue.objects.all()
-                                           .select_related('product_param', 'product_param_value_str')))
-                # .prefetch_related('productparametervalue_set')
-                # .prefetch_related('productparametervalue_set__product_param_value_str')
-                # .prefetch_related('productparametervalue_set__product_param')
+                                           .select_related('product_param')
+                                           .order_by('product_param__product_param_name')
+                                           .select_related('product_param_value_str'))
+                                  )
                 .prefetch_related('additional_product_image')
                 .prefetch_related(Prefetch('comment_set',
                                            queryset=Comment.objects.all()
@@ -245,17 +178,17 @@ class ProductView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['user_comment'] = Comment.objects.filter(customer=self.request.user)
         context['comment_form'] = CustomerCommentForm()
         evaluation_sum = 0  # сумма оценок товара
         comments = context['product'].comment_set.all()
         for comment in comments:
             evaluation_sum += comment.evaluation
             if comment.customer == self.request.user:
-                context['user_comment'] = comment  # комментарий теущего пользователя
+                context['user_comment'] = comment  # комментарий текущего пользователя
         if comments:
             context['evaluation_count'] = len(comments)
             context['product_evaluation_average'] = round(evaluation_sum / context['evaluation_count'], 2)
+        context['basket_products_ids_list'] = list(map(int, Basket(self.request).product_ids))
         return context
 
     def post(self, request, *args, **kwargs):
@@ -263,22 +196,12 @@ class ProductView(DetailView):
         product = Product.objects.get(slug=self.kwargs['product_slug'])
         if form.is_valid():
             comment = form.save(commit=False)
-            comment.title = 'title'
             comment.customer = self.request.user
             comment.product = product
             comment.save()
 
         self.object = self.get_object()
         return self.render_to_response(context=self.get_context_data())
-
-
-"""
-def product(request, fishing_season_slug, category_slug, subcategory_slug, slug):
-    current_product = ProductParameterValue.objects.get(pk=product_id)
-    basket_rod_form = BasketAddProductForm()
-    context = {'current_rod': current_rod, 'basket_rod_form': basket_rod_form}
-    return render(request, 'store/rod.html', context)
-"""
 
 
 def basket_add(request, product_id):
@@ -292,7 +215,8 @@ def basket_add(request, product_id):
 def basket_update_quantity(request, product_id):
     basket = Basket(request)
     product = get_object_or_404(Product, id=product_id)
-    q_choices = [(i, str(i)) for i in range(1, 16)] # максимальный стартовый выбор количества для всех товаров в корзине
+    q_choices = [(i, str(i)) for i in
+                 range(1, 16)]  # максимальный стартовый выбор количества для всех товаров в корзине
     form = BasketAddProductForm(request.POST)
     form.quantity_choices(q_choices)
 

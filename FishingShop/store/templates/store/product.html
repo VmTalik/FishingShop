@@ -27,15 +27,27 @@
             <div>
                 <img class="image-product-in" src="{{product.image.url}}">
             </div>
+            {% if product.additional_product_image.all %}
             <div class="images-product-other">
                 {% for img in product.additional_product_image.all %}
                 <img class="images-product-other__item" src="{{img.add_product_image.url}}">
                 {% endfor %}
             </div>
+            {% endif %}
         </div>
         <div class="product-header__item-right">
-            <div class="product-price">Цена: {{product.price}} руб</div>
-            <a href="{% url 'basket_add' product_id=product.pk %}"><button class="add_to_basket">В корзину</button></a>
+            <div class="product-price">{{product.price}} &#8381;</div>
+            <div class="product-basket">
+                {% if product.pk not in basket_products_ids_list %}
+                <a href="{% url 'basket_add' product_id=product.pk %}">
+                    <button class="product-add_to_basket">В корзину</button>
+                </a>
+                {% else %}
+                <a href="{% url 'basket_detail' %}">
+                    <button class="product-already_in_basket">В корзине</button>
+                </a>
+                {% endif %}
+            </div>
         </div>
     </div>
     <div class="product-descr">Подробное описание
@@ -47,13 +59,23 @@
             <li>Артикул: {{product.slug}} </li>
             {% for p in product.productparametervalue_set.all %}
                 {% if p.product_param_value_int %}
-                <li>{{p.product_param}}: {{p.product_param_value_int}} {{p.product_param_measure_unit}}</li>
+                <li>{{p.product_param}}: {{p.product_param_value_int}}
+                    {% if p.product_param_measure_unit %}
+                    {{p.product_param_measure_unit}}
+                    {% endif %}
+                </li>
+                {% endif %}
+                {% if p.product_param_value_float %}
+                <li>{{p.product_param}}: {{p.product_param_value_float}}
+                    {% if p.product_param_measure_unit %}
+                    {{p.product_param_measure_unit}}
+                    {% endif %}
+                </li>
                 {% endif %}
                 {% if p.product_param_value_str %}
                 <li>{{p.product_param}}: {{p.product_param_value_str}}</li>
                 {% endif %}
                 {% endfor %}
-
         </ul>
     </div>
     {% if not user_comment and user.is_authenticated %}
@@ -74,7 +96,9 @@
         <div class="product-comments__comment">
             <p class="comment_signature">{{comment.customer.first_name}}</p>
             <p class="comment_date">{{comment.comment_date}}</p>
-            <p class="comment_rating" data-comment_rating="{{comment.evaluation}}"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>{{comment.evaluation}}</p>
+            <p class="comment_rating" data-comment_rating="{{comment.evaluation}}">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            </p>
             <p class="comment_header">{{comment.title}}</p>
             <p class="comment_text">{{comment.comment_text}}</p>
         </div>

@@ -5,7 +5,7 @@ from django.urls import reverse
 
 class Manufacturer(models.Model):
     manufacturer_name = models.CharField(max_length=35, unique=True, verbose_name='Название производителя')
-    brand_country = models.CharField(max_length=35, verbose_name="Страна производителя")
+    brand_country = models.CharField(max_length=35, null=True, verbose_name='Страна производителя')
 
     def __str__(self):
         return self.manufacturer_name
@@ -48,8 +48,8 @@ class FishingSeason(models.Model):
 
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=45, unique=True, verbose_name='Название категории товаров')
-    category_slug = models.SlugField(max_length=30, unique=True, verbose_name='Слаг для категории товара')
+    category_name = models.CharField(max_length=50, verbose_name='Название категории товаров')
+    category_slug = models.SlugField(max_length=50, verbose_name='Слаг для категории товара')
     category_image = models.ImageField(upload_to='product_categories_images/',
                                        verbose_name='Изображение категории товаров')
     fishing_season = models.ForeignKey(FishingSeason, on_delete=models.CASCADE, verbose_name='Сезон рыбалки')
@@ -68,8 +68,8 @@ class Category(models.Model):
 
 
 class SubCategory(models.Model):
-    subcategory_name = models.CharField(max_length=45, unique=True, verbose_name='Название подкатегории товаров')
-    subcategory_slug = models.CharField(max_length=30, verbose_name='Слаг для подкатегории товара')
+    subcategory_name = models.CharField(max_length=70, verbose_name='Название подкатегории товаров')
+    subcategory_slug = models.CharField(max_length=70, verbose_name='Слаг для подкатегории товара')
     subcategory_image = models.ImageField(upload_to='product_subcategories_images/',
                                           verbose_name='Изображение подкатегории товаров')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория товаров')
@@ -102,7 +102,7 @@ class Warehouse(models.Model):
 
 class AdditionalProductImage(models.Model):
     add_product_image = models.ImageField(upload_to='additional_product_images/',
-                                          verbose_name='Дополнительное фото товара')
+                                          verbose_name='Дополнительное фото товара', blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'Дополнительные фото товара'
@@ -110,18 +110,19 @@ class AdditionalProductImage(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=60, unique=True, verbose_name='Название товара')
-    slug = models.SlugField(max_length=30, unique=True, verbose_name='Артикул товара')
+    name = models.CharField(max_length=100, unique=True, verbose_name='Название товара')
+    slug = models.SlugField(max_length=100, unique=True, verbose_name='Артикул товара')
     price = models.PositiveIntegerField(verbose_name='Цена товара в руб.')
     description = models.TextField(verbose_name='Описание товара')
     image = models.ImageField(upload_to='product_images/', verbose_name='Основное фото товара')
-    supply_date = models.DateField(verbose_name='Дата поступления товара', null=True)
-    quantity = models.PositiveSmallIntegerField(verbose_name='Количество единиц товара', null=True)
+    supply_date = models.DateField(null=True, verbose_name='Дата поступления товара')
+    quantity = models.PositiveSmallIntegerField(verbose_name='Количество единиц товара')
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE, verbose_name='Подкатегория товара')
     manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE, verbose_name='Производитель товара')
-    warehouse = models.ForeignKey(Warehouse, on_delete=models.SET_NULL, null=True,
+    warehouse = models.ForeignKey(Warehouse, null=True, on_delete=models.SET_NULL,
                                   verbose_name='Наличие товара на складе')
-    additional_product_image = models.ManyToManyField(AdditionalProductImage, verbose_name='Дополнительные фото товара')
+    additional_product_image = models.ManyToManyField(AdditionalProductImage, verbose_name='Дополнительные фото товара',
+                                                      blank=True)
 
     def __str__(self):
         return self.name
@@ -140,8 +141,8 @@ class Product(models.Model):
 
 
 class ProductParameter(models.Model):
-    product_param_name = models.CharField(max_length=35, unique=True, verbose_name='Название параметра товара')
-    product_param_slug = models.SlugField(max_length=25, unique=True, verbose_name='Слаг для названия параметра товара')
+    product_param_name = models.CharField(max_length=100, unique=True, verbose_name='Название параметра товара')
+    product_param_slug = models.SlugField(max_length=100, unique=True, verbose_name='Слаг для названия параметра товара')
 
     def __str__(self):
         return self.product_param_name
@@ -152,7 +153,7 @@ class ProductParameter(models.Model):
 
 
 class ProductParameterValueStr(models.Model):
-    product_param_value_str = models.CharField(max_length=35, unique=True,
+    product_param_value_str = models.CharField(max_length=60, unique=True,
                                                verbose_name='Строковое значение параметра товара')
 
     def __str__(self):
@@ -169,6 +170,8 @@ class ProductParameterValue(models.Model):
     ]
     product_param_value_int = models.PositiveSmallIntegerField(verbose_name='Целое значение параметра товара',
                                                                null=True, blank=True)
+    product_param_value_float = models.FloatField(verbose_name='Вещественное значение параметра товара',
+                                                  null=True, blank=True)
     product_param_measure_unit = models.CharField(max_length=2, choices=MEASURE_UNIT_CHOICES,
                                                   verbose_name='Единица измерения параметра товара',
                                                   null=True, blank=True)
@@ -194,7 +197,7 @@ class ProductParameterValue(models.Model):
 class Buy(models.Model):
     wishes = models.CharField(max_length=100, verbose_name='Пожелания к заказу', null=True, blank=True)
     delivery_date = models.DateField(verbose_name='Желаемая дата доставки', null=True, blank=True)
-    #Потом у полей убрать null, blank !!
+    # Потом у полей убрать null, blank !!
     delivery_city = models.CharField(max_length=25, verbose_name='Город', null=True, blank=True)
     delivery_region = models.CharField(max_length=25, verbose_name='Область, край', null=True, blank=True)
     delivery_address = models.CharField(max_length=150, verbose_name='Адрес доставки', null=True, blank=True)
@@ -234,12 +237,12 @@ class BuyProduct(models.Model):
 
 class Comment(models.Model):
     EVALUATION_CHOICES = [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)]
-    title = models.CharField(max_length=60, verbose_name='Заголовок комментария')
-    evaluation = models.PositiveSmallIntegerField(verbose_name='Оценка', choices=EVALUATION_CHOICES, default=5)
+    title = models.CharField(max_length=60, verbose_name='Заголовок комментария', null=True, blank=True)
     comment_text = models.CharField(max_length=180, verbose_name='Текст комментария')
+    evaluation = models.PositiveSmallIntegerField(verbose_name='Оценка', choices=EVALUATION_CHOICES, default=5)
     comment_date = models.DateField(verbose_name='Дата комментария', auto_now_add=True)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)  # null убрать!
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title

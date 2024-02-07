@@ -5,55 +5,98 @@
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/product-filter.css' %}">
 {% with subcategory=current_products_queryset.0.subcategory %}
+{% with category=subcategory.category %}
 <p class="pages_route">
     <a href="{% url 'index' %}">Главная</a> >
-    <a href="{{subcategory.category.fishing_season.get_absolute_url}}">{{subcategory.category.fishing_season}}</a> >
-    <a href="{{subcategory.category.get_absolute_url}}">{{subcategory.category}}</a> >
+    <a href="{{category.fishing_season.get_absolute_url}}">{{category.fishing_season}}</a> >
+    <a href="{{category.get_absolute_url}}">{{category}}</a> >
     <a href="{{subcategory.get_absolute_url}}">{{subcategory}}
-        <span class="lowercase_category">{{subcategory.category}}</span>
+        {% if category.category_name == 'Удилища' and category.fishing_season.fishing_season_name == 'Летняя рыбалка' or category.category_name == 'Катушки' and subcategory.subcategory_name != 'Запчасти для катушек' %}
+        <span class="lowercase_category">{{category}}</span>
+        {% endif %}
     </a>
 </p>
-<h2 class="products_name">{{subcategory}} <span class="lowercase_category">{{subcategory.category}}</span></h2>
+<h2 class="products_name">{{subcategory}}
+    {% if category.category_name == 'Удилища' and category.fishing_season.fishing_season_name == 'Летняя рыбалка' or category.category_name == 'Катушки' and subcategory.subcategory_name != 'Запчасти для катушек' %}
+    <span class="lowercase_category">{{category}}</span>
+    {% endif %}
+</h2>
 {% endwith %}
+{% endwith %}
+<div class="products-sorted">
+    <select name="sort" id="sort">
+        <option selected value="popular">Популярные</option>
+        <option value="price">Сначала недорогие</option>
+        <option value="-price">Сначала дорогие</option>
+        <option value="new">Сначала новинки</option>
+        <option value="discussed">Обсуждаемые</option>
+        <option value="rating">По рейтингу</option>
+    </select>
+</div>
 <div class="products-wrap product-wrap">
     <div class="products-list product-list">
         {% for product in current_products_queryset %}
-        <div class="products-list__item product-list__item">
-            <div>
-                <a href="{{product.get_absolute_url}}">
-                    <img class="image-product" src="{{product.image.url}}">
-                    <div class="products__item-name">{{product.name}}</div>
-                </a>
-                <div class="{{product.subcategory.category.category_slug}}__item-price product__item-price">Цена: <span>{{product.price}}</span> руб</div>
-                <div class="products__item-manufacturer product__item-manufacturer">Производитель:<span>{{product.manufacturer.manufacturer_name}}</span></div>
+        <div class="products-list__item product-list__item" data-price="{{product.price}}" 
+        data-count_buyproduct="{{product.count_buyproduct}}" data-count_comments="{{product.count_comments}}"
+        data-rating="{{product.avg_evaluation}}" data-supply_date="product.supply_date">
+            <a href="{{product.get_absolute_url}}">
+                <img class="image-product" src="{{product.image.url}}">
+                <div class="products__item-name">{{product.name}}</div>
+            </a>
+            <div class="products-list__item-parameters">
+                <div class="products__item-manufacturer product__item-manufacturer">
+                    Производитель: <span>{{product.manufacturer.manufacturer_name}}</span>
+                </div>
                 {% for p in product.productparametervalue_set.all%}
                 {% if p.product_param_value_int %}
-                <div class="product__item-{{p.product_param.product_param_slug}}">{{p.product_param}}: <span>{{p.product_param_value_int}}</span> {{p.product_param_measure_unit}}</div>
+                <div class="product__item-{{p.product_param.product_param_slug}}">{{p.product_param}}:
+                    <span>{{p.product_param_value_int}}</span>
+                    {% if p.product_param_measure_unit %} {{p.product_param_measure_unit}} {% endif %}
+                </div>
+                {% endif %}
+                {% if p.product_param_value_float %}
+                <div class="product__item-{{p.product_param.product_param_slug}}">{{p.product_param}}:
+                    <span>{{p.product_param_value_float|formatted}}</span>
+                    {% if p.product_param_measure_unit %} {{p.product_param_measure_unit}} {% endif %}
+                </div>
                 {% endif %}
                 {% if p.product_param_value_str %}
-                <div class="product__item-{{p.product_param.product_param_slug}}">{{p.product_param}}: <span>{{p.product_param_value_str}}</span></div>
+                <div class="product__item-{{p.product_param.product_param_slug}}">{{p.product_param}}:
+                    <span>{{p.product_param_value_str}}</span>
+                </div>
                 {% endif %}
                 {% endfor %}
-                <div class="product_ratings">
-                    {% with products_evaluations_values=products_evaluations|get_dict_value:product %}
-                    {% if products_evaluations_values %}
-                    ⭐ {{products_evaluations_values.0}}
-                    <span>&#x1F5E8;</span>
-                    {{products_evaluations_values.1}} {{products_evaluations_values.1|rus_plural:"отзыв, отзыва, отзывов"}}
-                    {% endif %}
-                    {% endwith %}
+                <div class="{{product.subcategory.category.category_slug}}__item-price product__item-price">
+                    <span>{{product.price}}</span> &#8381;
                 </div>
-                <div class="add_to_basket">
-                    {% if product.pk not in basket_products_ids_list %}
-                    <a href="{% url 'basket_add' product_id=product.pk %}">
-                        <button class="add_to_basket">В корзину</button>
-                    </a>
-                    {% else %}
-                    <a href="{% url 'basket_detail' %}">
-                        <button class="already_in_basket">В корзине</button>
-                    </a>
-                    {% endif %}
-                </div>
+            </div>
+            <div class="product_ratings">
+                {% comment %}
+                {% with products_evaluations_values=products_evaluations|get_dict_value:product %}
+                {% if products_evaluations_values %}
+                ⭐ {{products_evaluations_values.0}}
+                <span>&#x1F5E8;</span>
+                {{products_evaluations_values.1}} {{products_evaluations_values.1|rus_plural:"отзыв, отзыва, отзывов"}}
+                {% endif %}
+                {% endwith %}
+                {% endcomment %}
+
+                {% if product.avg_evaluation %}
+                ⭐ {{product.avg_evaluation}}
+                <span>&#x1F5E8;</span>
+                {{product.count_comments}} {{product.count_comments|rus_plural:"отзыв, отзыва, отзывов"}}
+                {% endif %}
+            </div>
+            <div class="products_basket">
+                {% if product.pk not in basket_products_ids_list %}
+                <a href="{% url 'basket_add' product_id=product.pk %}">
+                    <button class="add_to_basket">В корзину</button>
+                </a>
+                {% else %}
+                <a href="{% url 'basket_detail' %}">
+                    <button class="already_in_basket">В корзине</button>
+                </a>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
@@ -91,7 +134,7 @@
             </div>
         </div>
 
-        {% for p, p_vals in product_param_str.items %}
+        {% for p, p_vals in products_params_str.items %}
         <div class="products-filter__{{p.product_param_slug}} product-filter__checkbox">
             <p class="checkboxName" data-paramcheckbox="{{p.product_param_slug}}">{{p.product_param_name}}</p>
             <div class="checkboxes">
@@ -102,28 +145,30 @@
         </div>
         {% endfor %}
 
-        {% for p, p_vals in product_param_int.items %}
-        <div class="products-filter__rod_weight product-filter__label">
+        {% for p, p_vals in products_params_min_max.items %}
+        {% if p_vals.0|formatted != p_vals.1|formatted %}
+        <div class="product-filter__label">
             <p class="rangeName" data-paramrange="{{p.product_param_slug}}">{{p.product_param_name}}</p>
             <div class="{{p.product_param_slug}}-input product-filter__input">
                 <div class="{{p.product_param_slug}}-field product-filter__field">
                     <span>Мин.</span>
-                    <input type="number" class="input-min" placeholder="{{p_vals.0}}">
+                    <input type="number" class="input-min" placeholder="{{p_vals.0|formatted}}">
                 </div>
                 <div class="separator">-</div>
                 <div class="{{p.product_param_slug}}-field product-filter__field">
                     <span>Макс.</span>
-                    <input type="number" class="input-max" placeholder="{{p_vals.1}}">
+                    <input type="number" class="input-max" placeholder="{{p_vals.1|formatted}}">
                 </div>
             </div>
             <div class="{{p.product_param_slug}}-slider slider">
                 <div class="{{p.product_param_slug}}-progress progress"></div>
             </div>
             <div class="{{p.product_param_slug}}-range-input range-input" data-rangeminmax="{{p_vals|join:' '}}">
-                <input type="range" class="{{p.product_param_slug}}-range-min range-min" min="{{p_vals.0}}" max="{{p_vals.1}}" value="{{p_vals.0}}">
-                <input type="range" class="{{p.product_param_slug}}-range-max range-max" min="{{p_vals.0}}" max="{{p_vals.1}}" value="{{p_vals.1}}">
+                <input type="range" class="{{p.product_param_slug}}-range-min range-min" min="{{p_vals.0|formatted}}" max="{{p_vals.1|formatted}}" value="{{p_vals.0|formatted}}">
+                <input type="range" class="{{p.product_param_slug}}-range-max range-max" min="{{p_vals.0|formatted}}" max="{{p_vals.1|formatted}}" value="{{p_vals.1|formatted}}">
             </div>
         </div>
+        {% endif %}
         {% endfor %}
     </div>
 </div>

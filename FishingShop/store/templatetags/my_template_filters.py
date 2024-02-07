@@ -1,5 +1,6 @@
 # from django.template.defaulttags import register
 from django import template
+from datetime import datetime
 
 register = template.Library()
 
@@ -24,3 +25,9 @@ def rus_plural(value, variants):
     return variants[variant]
 
 
+@register.filter
+def formatted(value):
+    if type(value) is int:
+        return str(value)
+    if type(value) is float:
+        return str(value).replace(',', '.')
