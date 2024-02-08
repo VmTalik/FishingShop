@@ -30,17 +30,11 @@
     color: rgb(63, 61, 61);
 }
 
-.about, .contacts, .faq {
-    font-size: 18px;
-    text-indent: 30px;
-    line-height: 1.5;
-}
-
-.login, .profile {
+.navbar__login, .navbar__profile {
     padding-left: 45%;
 }
 
-.login, .profile, .logout {
+.navbar__login, .navbar__profile, .navbar__logout {
     color: #000;
     font-weight: bold;
 }
@@ -139,6 +133,12 @@
     padding: 19px 20px;
     background-color: white;
     min-height: 100vh;
+}
+
+.about, .contacts, .faq {
+    font-size: 18px;
+    text-indent: 30px;
+    line-height: 1.5;
 }
 
 .main__new_products, 
@@ -666,6 +666,7 @@
   width: 80%;
   border-collapse: collapse;
   text-align: left;
+  margin-top: 35px;
 }
 
 .table-orders td {
@@ -992,7 +993,6 @@ height: 80px;
 .register_form input[type="submit"]:hover {
     background-color: #87CEFA;
 }
-
 
 .register_form .bool_field_register {
     background-color: red;
