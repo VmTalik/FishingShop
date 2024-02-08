@@ -14,13 +14,14 @@ from django.contrib.auth.views import LoginView, PasswordChangeView, LogoutView,
     PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic.edit import CreateView, DeleteView
 from django.views.generic.base import TemplateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.core.signing import BadSignature
 from .utilities import signer
 from django.db.models.functions import Round
+from django.template import TemplateDoesNotExist
 
 
 def index(request):
@@ -34,6 +35,13 @@ def index(request):
                         .annotate(count_buyproduct=Count('buyproduct')).order_by('-count_buyproduct')[:8])
     context = {'new_products': new_products, 'popular_products': popular_products}
     return render(request, 'store/index.html', context)
+
+
+def other_page(request, page):
+    try:
+        return render(request, 'store/' + page + '.html')
+    except TemplateDoesNotExist:
+        raise Http404
 
 
 def manufacturers(request):
@@ -52,7 +60,7 @@ def product_categories(request, fishing_season_slug):
     if product_categories_queryset:
         return render(request, 'store/product_categories.html', context)
     else:
-        raise Http404('Нет такой страницы с категориями товаров!')
+        raise Http404
 
 
 def product_subcategories(request, fishing_season_slug, category_slug):
@@ -67,7 +75,7 @@ def product_subcategories(request, fishing_season_slug, category_slug):
     if product_subcategories_queryset:
         return render(request, 'store/product_subcategories.html', context)
     else:
-        raise Http404('Нет такой страницы с подкатегориями товаров!')
+        raise Http404
 
 
 class ProductsView(ListView):

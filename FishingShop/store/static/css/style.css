@@ -30,6 +30,12 @@
     color: rgb(63, 61, 61);
 }
 
+.about, .contacts, .faq {
+    font-size: 18px;
+    text-indent: 30px;
+    line-height: 1.5;
+}
+
 .login, .profile {
     padding-left: 45%;
 }
