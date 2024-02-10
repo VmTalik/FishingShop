@@ -338,14 +338,15 @@ def order_tracking(request, buy_id):
                        .select_related('product__subcategory__category__fishing_season')
                        )
     buy_steps = BuyStep.objects.filter(buy=buy_id).order_by('-step_begin_date').select_related('step')
+    buy = Buy.objects.select_related('customer').get(id=buy_id)
     total_products_price = 0
     for product in products_bought:
         total_products_price += product.product_price * product.product_amount
 
     return render(request, 'store/order_tracking.html',
-                  {'products_bought': products_bought,
-                   'buy_steps': buy_steps, 'buy_id': buy_id,
-                   'total_products_price': total_products_price})
+                  {'products_bought': products_bought,'buy_steps': buy_steps, 
+                  'buy_id': buy_id, 'buy':buy,
+                  'total_products_price': total_products_price})
 
 
 @login_required

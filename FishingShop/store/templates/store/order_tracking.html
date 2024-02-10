@@ -9,12 +9,12 @@
     <a href="{% url 'order_tracking' buy_id %}">Отслеживание доставки</a>
 </p>
 <h2>Отслеживание доставки по заказу №{{buy_id}}</h2>
-<table class="basket">
+<table class="completed_order-table">
     <thead>
         <tr>
-            <th></th>
-            <th>Название продукта</th>
-            <th>Цена, руб.</th>
+            <th>Фото</th>
+            <th>Название</th>
+            <th>Цена, &#8381;</th>
             <th>Количество</th>
         </tr>
     </thead>
@@ -32,12 +32,21 @@
             </tr>
             {% endfor %}
             <tr class="total">
-                <td colspan="4"></td>
-                <td>Суммарный чек:</td>
-                <td class="num">{{total_products_price}} руб.</td>
+                <td colspan="2"></td>
+                <td>Суммарный чек: <br><span style="font-size:12px;">(без учёта стоимости доставки)</span></td>
+                <td class="num"> {{total_products_price}} &#8381;</td>
             </tr>
             </tbody>
             </table>
+<div class="completed_order_info">
+    <p>Информация о заказе </p>
+    <ul>
+        <li>Получатель: &nbsp;{% if buy.customer.last_name %} {{buy.customer.last_name}} {% endif %}
+        {% if buy.customer.first_name %}{{buy.customer.first_name}} {% endif %}
+        {% if buy.customer.patronymic %}{{buy.customer.patronymic}} {% endif %}</li>
+        <li>Адрес доставки: &nbsp; {{buy.delivery_address}}</li>
+    </ul>
+</div>
 <div class="order-tracking">
 {% with first_buy_step=buy_steps.last %}
 {% for buy_step in buy_steps %}
