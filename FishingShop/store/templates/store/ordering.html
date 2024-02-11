@@ -17,7 +17,7 @@
     </tr>
     <tr>
       <td>на сумму:</td>
-      <td>{{ basket.get_total_price }} руб.</td>
+      <td>{{ basket.get_total_price }} &#8381;</td>
     </tr>
   </tbody>
 </table>
@@ -28,15 +28,15 @@
             {% with product=item.product %}
             <tr>
                 <td><a href="{{ product.get_absolute_url }}">
-                        <img class="ordering__product_image" src="{{ product.image.url }}">{{ product.name }}
+                        <img class="ordering__product_image" src="{{ product.image.url }}"> {{ product.name }}
                     </a></td>
-                <td class="num"><span>{{ item.price }} руб. x {{item.quantity}}</span> </td>
+                <td class="num"><span>{{ item.price }} &#8381; x {{item.quantity}}</span> </td>
             </tr>
             {% endwith %}
             {% endfor %}
             <tr class="total">
                 <td colspan="4"></td>
-                <td style="font-size: 18px;" class="num">Итого к оплате: {{ basket.get_total_price }} руб.</td>
+                <td style="font-size: 18px;" class="num">Итого к оплате: {{ basket.get_total_price }} &#8381;</td>
             </tr>
             <tr>
                 <td colspan="4"></td>

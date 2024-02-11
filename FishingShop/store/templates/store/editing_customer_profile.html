@@ -15,11 +15,11 @@
     {{ customer_profile_form.as_p}}
     <input type="submit" value="Обновить данные">
 </form>
-<div style="margin-top: 50px">
-При желании Вы также можете:
-<ul>
-    <li><a class="password_change" href="{% url 'password_change' %}">Изменить пароль</a></li>
-    <li><a class="delete_account" href="{% url 'delete_account' %}">Удалить аккаунт</a></li>
-</ul>
+<div class="edit_customer_profile_more">
+    При желании Вы также можете:
+    <ul>
+        <li><a class="password_change" href="{% url 'password_change' %}">Изменить пароль</a></li>
+        <li><a class="delete_account" href="{% url 'delete_account' %}">Удалить аккаунт</a></li>
+    </ul>
 </div>
 {% endblock %}

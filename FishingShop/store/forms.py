@@ -120,4 +120,4 @@ class CustomerCommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        exclude = ('title', 'customer', 'product', 'comment_date')
+        exclude = ('customer', 'product', 'comment_date')

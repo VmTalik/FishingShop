@@ -215,21 +215,22 @@
     line-height: 1.5;
 }
 
-.manufacturers-list{
+.manufacturers-list {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-gap: 10px;
     grid-auto-rows: minmax(100px, auto);
     margin: 10px;
-    
 }
 
-.manufacturers__item{
-    border: 1px solid rgb(240, 63, 63);
+.manufacturers__item {
+    border: 1px solid rgb(163, 108, 56);
     font-family: cursive;
     font-weight: bold;
     font-size: 18pt;
+    color: rgb(11, 91, 128);
     padding: 10px;
+    box-shadow: 4px 4px 6px #969191;
 }
 
 /*Строка с маршрутом страниц */
@@ -492,12 +493,7 @@
 }
 
 .basket td a {
-    color: rgb(4, 32, 43);
-}
-
-.basket td a:hover {
-    transform: scale(1.3);
-    transition: 0.5s;
+    color: rgb(5, 24, 32);
 }
 
 .basket .total td {
@@ -523,9 +519,27 @@
     letter-spacing: 1px;
     padding: 0;
     padding-top: 20px;
+    padding-bottom: 50px;
     border-bottom: none;
     white-space: nowrap;
     text-align: left;
+}
+
+.basket_login {
+    font-size: 18px;
+}
+
+.basket_login a {
+    font-weight: bold;
+    color: rgb(192, 98, 11);
+}
+
+.basket_ordering td a {
+    color:rgb(167, 104, 54);
+}
+
+.basket_ordering td a:hover {
+    color: rgb(18, 177, 26);
 }
 
 /*Подробности товара*/
@@ -637,10 +651,55 @@
 
 }
 
+.product-write_comment > p {
+    margin-top: 30px;
+    font-weight: bold;
+    font-size: 20px;
+}
+
 /*Личный кабинет клиента*/
 
+.customer-hello {
+    font-size: 18px;
+}
+
+.customer-personal {
+    line-height: 1.5;
+    margin-top: 35px;
+    font-size: 17px;
+}
+
+.customer-personal button {
+    font-size: 14px;
+    box-shadow: 0 2px 5px #c0aeae;
+}
+
+.edit_customer_profile_more {
+    margin-top: 50px;
+    line-height: 1.5;
+}
+
+.edit_customer_profile_more a {
+    color: #0b0b33;
+}
+
+.edit_customer_profile_more a:hover {
+    color: #b95909;
+}
+
+.customer-delivery {
+    margin-top: 35px;
+}
+
+.customer-delivery .edit_profile {
+    margin-top: 15px;
+    font-size: 14px;
+    box-shadow: 0 2px 5px #c0aeae;
+    margin-bottom: 32px;
+}
+
 .table-customer-delivery {
-  font-size: 14px;
+  font-size: 16px;
   background: white;
   max-width: 70%;
   width: 60%;
@@ -649,7 +708,7 @@
 }
 
 .table-customer-delivery td {
-  color: #669;
+  color: rgb(60, 60, 73);
   padding: 9px 8px;
   transition: .3s linear;
   border-bottom: 1px solid #ccc;
@@ -660,13 +719,13 @@
 }
 
 .table-orders {
-  font-size: 14px;
+  font-size: 16px;
   font-style: italic;
   background: white;
   width: 80%;
   border-collapse: collapse;
   text-align: left;
-  margin-top: 35px;
+  margin-top: 25px;
 }
 
 .table-orders td {
@@ -685,12 +744,49 @@
   color: #2F4F4F;
 }
 
+.completed_order-table {
+    border-collapse: collapse;
+    width: 85%;
+}
+
+.completed_order-table td,
+.completed_order-table th {
+    text-align: center;
+    border-bottom: 1px solid gray;
+    padding: 20px 60px 20px 0px;
+}
+
+.completed_order-table td {
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.completed_order-table td a {
+    color: rgb(5, 24, 32);
+}
+
+.completed_order-table .total td {
+    font-size: 19px;
+    padding: 0;
+    padding-top: 30px;
+    border-bottom: none;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.completed_order_info {
+    line-height: 1.5;
+    font-size: 18px;
+}
+
 .order-tracking{
 border: 2px solid black;
+border-radius: 8px;
 height: auto;
 width: 600px;
-margin-top: 20px;
+margin-top: 30px;
 margin-left: 50px;
+box-shadow: 4px 8px 14px #b9b4b4;
 }
 
 .order-tracking__circle{
@@ -709,6 +805,7 @@ position: absolute;
 left: 30px;
 white-space: nowrap;
 font-style: italic;
+font-size: 18px;
 }
 
 .order-tracking__line{
@@ -734,7 +831,7 @@ height: 80px;
 }
 
 .product-comments__comment .comment_signature{
-    font-weight: bold;
+    font-style: italic;
     display: inline-block;
 }
 
@@ -778,10 +875,16 @@ height: 80px;
 .table-ordering {
     width: 70%;
     margin: 10px;
+    border-spacing: 10px;
 }
 
 .table-ordering td {
     white-space: nowrap;
+}
+
+.table-ordering td a {
+    color:#283b7e;
+    padding-right: 20px;
 }
 
 .ordering__product_image {
@@ -796,7 +899,7 @@ height: 80px;
     padding: 31px;
     margin-top: 30px;
     margin-left: 50px;
-    box-shadow: 0 4px 16px #ccc;
+    box-shadow: 0 4px 16px #a7a5a5;
     border-radius: 12px;
     font-family: sans-serif;
 }
@@ -940,10 +1043,19 @@ height: 80px;
 
 .login_other {
     margin-left: 50px;
+    margin-top: 30px;
 }
 
 .login_other p:nth-child(2) {
     font-weight: bold;
+}
+
+.login_other a {
+    color: rgb(11, 48, 63);
+}
+
+.login_other a:hover {
+    color: rgb(151, 106, 9);
 }
 
 /* Форма регистрации пользователя */
@@ -953,7 +1065,7 @@ height: 80px;
     padding: 31px;
     margin-top: 30px;
     margin-left: 50px;
-    box-shadow: 0 4px 16px #ccc;
+    box-shadow: 0 4px 16px #747373;
     border-radius: 12px;
     font-family: sans-serif;
 }
@@ -997,6 +1109,89 @@ height: 80px;
 .register_form .bool_field_register {
     background-color: red;
     margin-right: 10px;
+}
+
+/*Форма для написания комментариев */
+
+.product-write_comment form {
+    width: 420px;
+    padding: 31px;
+    margin-top: 10px;
+    margin-left: 10px;
+    box-shadow: 0 4px 16px #8d8b8b;
+    border-radius: 12px;
+}
+
+.product-write_comment form select {
+    font-size: 16px;
+}
+
+.product-write_comment form input {
+    width: 100%;
+    padding-top: 5px;
+    font-size: 17px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    box-shadow: 1px 3px 15px lightblue;
+}
+
+.product-write_comment form label {
+    font-size: 17px;
+}
+
+.product-write_comment form input[type="submit"] {
+    margin-top: 18px;
+    margin-left: 80px;
+    width: 50%;
+    background-color: #B0E0E6;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.product-write_comment form input[type="submit"]:hover {
+    background-color: #87CEFA;
+}
+
+.product-write_comment form textarea {
+    resize: none;
+    width: 100%;
+    box-shadow: 1px 3px 15px lightblue;
+}
+
+/*Форма изменения пароля */
+.password_change_form {
+    width: 420px;
+    padding: 31px;
+    margin-top: 10px;
+    margin-left: 10px;
+    box-shadow: 0 4px 16px #ccc;
+    border-radius: 12px;
+}
+
+.password_change_form input {
+    width: 100%;
+    padding-top: 5px;
+    font-size: 16px;
+    padding-bottom: 5px;
+    border-radius: 4px;
+    box-shadow: 1px 3px 15px lightblue;
+}
+
+.password_change_form label {
+    font-size: 17px;
+}
+
+.password_change_form input[type="submit"] {
+    margin-top: 18px;
+    margin-left: 80px;
+    width: 50%;
+    background-color: #B0E0E6;
+    border-radius: 8px;
+    font-size: 17px;
+}
+
+.password_change_form input[type="submit"]:hover {
+    background-color: #87CEFA;
 }
 
 /*Отмена подчеркивания у ссылок */

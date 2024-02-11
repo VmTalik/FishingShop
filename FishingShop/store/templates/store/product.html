@@ -94,7 +94,9 @@
         <p>Все отзывы к товару</p>
         {% for comment in product.comment_set.all %}
         <div class="product-comments__comment">
-            <p class="comment_signature">{{comment.customer.first_name}}</p>
+            <p class="comment_signature">
+                {% if comment.customer.first_name %}{{comment.customer.first_name}}{% else %}No name {% endif %}
+            </p>
             <p class="comment_date">{{comment.comment_date}}</p>
             <p class="comment_rating" data-comment_rating="{{comment.evaluation}}">
                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
