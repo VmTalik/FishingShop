@@ -41,9 +41,7 @@
 <div class="completed_order_info">
     <p>Информация о заказе </p>
     <ul>
-        <li>Получатель: &nbsp;{% if buy.customer.last_name %} {{buy.customer.last_name}} {% endif %}
-        {% if buy.customer.first_name %}{{buy.customer.first_name}} {% endif %}
-        {% if buy.customer.patronymic %}{{buy.customer.patronymic}} {% endif %}</li>
+        <li>Получатель: &nbsp;{{buy.buyer_full_name}}</li>
         <li>Адрес доставки: &nbsp; {{buy.delivery_address}}</li>
     </ul>
 </div>
@@ -51,9 +49,11 @@
 {% with first_buy_step=buy_steps.last %}
 {% for buy_step in buy_steps %}
     {% if buy_steps.count == 1 or buy_step == first_buy_step %}
-    <div class="order-tracking__circle"><span>{{buy_step.step.step_name}} - {{buy_step.step_begin_date}}</span></div>
+    <div class="order-tracking__circle">
+        <span>{{buy_step.step.step_name}} - {{buy_step.step_begin_datetime}}</span>
+    </div>
     {% else %}
-    <div class="order-tracking__circle"><span>{{buy_step.step.step_name}} - {{buy_step.step_begin_date}}</span>
+    <div class="order-tracking__circle"><span>{{buy_step.step.step_name}} - {{buy_step.step_begin_datetime}}</span>
         <div class="order-tracking__line" ></div>
     </div>
     {% endif %}

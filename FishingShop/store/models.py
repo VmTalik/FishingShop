@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
+from django.core import validators
 
 
 class Manufacturer(models.Model):
@@ -20,11 +21,18 @@ class Customer(AbstractUser):
     patronymic = models.CharField(max_length=30, verbose_name='Отчество', null=True, blank=True)
     send_messages = models.BooleanField(default=True, verbose_name='Высылать оповещения о новых товарах?')
     is_activated = models.BooleanField(default=True, db_index=True, verbose_name="Прошел активацию?")
-    phone_number = models.CharField(max_length=17, unique=True, verbose_name='Номер телефона', null=True, blank=True)
+    phone_number = models.CharField(max_length=17, unique=True, verbose_name='Номер телефона',
+                                    validators=[validators.RegexValidator(
+                                        regex=r'^(\+7|7|8)?(\s|-|\()?[(]?\d{3}[)]?[\s|-]?\d{3}-?\d{2}-?\d{2}$')],
+                                    error_messages={'invalid': 'Неправильный формат номера телефона!'},
+                                    null=True)
     city = models.CharField(max_length=25, verbose_name='Город', null=True, blank=True)
     region = models.CharField(max_length=25, verbose_name='Область, край', null=True, blank=True)
-    postcode = models.CharField(max_length=6, verbose_name='Почтовый индекс', null=True, blank=True)
-    delivery_address = models.CharField(max_length=150, verbose_name='Адрес доставки', null=True, blank=True)
+    postcode = models.CharField(max_length=6, verbose_name='Почтовый индекс',
+                                validators=[validators.RegexValidator(regex=r'^\d{6}$')],
+                                error_messages={'invalid': 'Почтовый индекс должен состоять из 6-ти цифр!'},
+                                null=True, blank=True)
+    delivery_address = models.CharField(max_length=150, verbose_name='Адрес доставки', null=True)
 
     class Meta(AbstractUser.Meta):
         verbose_name_plural = 'Клиенты'
@@ -142,7 +150,8 @@ class Product(models.Model):
 
 class ProductParameter(models.Model):
     product_param_name = models.CharField(max_length=100, unique=True, verbose_name='Название параметра товара')
-    product_param_slug = models.SlugField(max_length=100, unique=True, verbose_name='Слаг для названия параметра товара')
+    product_param_slug = models.SlugField(max_length=100, unique=True,
+                                          verbose_name='Слаг для названия параметра товара')
 
     def __str__(self):
         return self.product_param_name
@@ -197,13 +206,15 @@ class ProductParameterValue(models.Model):
 class Buy(models.Model):
     wishes = models.CharField(max_length=100, verbose_name='Пожелания к заказу', null=True, blank=True)
     delivery_date = models.DateField(verbose_name='Желаемая дата доставки', null=True, blank=True)
-    # Потом у полей убрать null, blank !!
     delivery_city = models.CharField(max_length=25, verbose_name='Город', null=True, blank=True)
     delivery_region = models.CharField(max_length=25, verbose_name='Область, край', null=True, blank=True)
-    delivery_address = models.CharField(max_length=150, verbose_name='Адрес доставки', null=True, blank=True)
-    buyer_full_name = models.CharField(max_length=50, verbose_name='ФИО покупателя', null=True, blank=True)
-    buyer_phone_number = models.CharField(max_length=17, verbose_name='Номер телефона', null=True, blank=True)
+    delivery_address = models.CharField(max_length=150, verbose_name='Адрес доставки')
+    buyer_full_name = models.CharField(max_length=80, verbose_name='ФИО покупателя')
+    buyer_phone_number = models.CharField(max_length=17, verbose_name='Номер телефона')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'Заказ №{self.pk}'
 
     class Meta:
         verbose_name_plural = 'Заказы'
@@ -211,19 +222,21 @@ class Buy(models.Model):
 
 
 class Step(models.Model):
-    step_name = models.CharField(max_length=30, unique=True, verbose_name='Название стадии покупки')
+    step_name = models.CharField(max_length=30, unique=True, verbose_name='Название этапа обработки заказа')
 
     def __str__(self):
         return self.step_name
 
     class Meta:
-        verbose_name_plural = 'Названия стадий покупок'
-        verbose_name = 'Название стадии покупки'
+        verbose_name_plural = 'Названия этапов обработки заказа'
+        verbose_name = 'Название этапа обработки заказа'
 
 
 class BuyStep(models.Model):
-    step_begin_date = models.DateField(verbose_name='Дата начала стадии покупки', auto_now_add=True)
-    step_end_date = models.DateField(verbose_name='Дата конца стадии покупки', null=True, blank=True)
+    step_begin_datetime = models.DateTimeField(verbose_name='Дата и время начала этапа обработки заказа',
+                                               null=True, blank=True, auto_now_add=True)
+    step_end_datetime = models.DateTimeField(verbose_name='Дата и время завершения этапа обработки заказа',
+                                             null=True, blank=True)
     buy = models.ForeignKey(Buy, on_delete=models.CASCADE)
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
 
@@ -240,7 +253,7 @@ class Comment(models.Model):
     title = models.CharField(max_length=60, verbose_name='Заголовок комментария', null=True, blank=True)
     comment_text = models.CharField(max_length=180, verbose_name='Текст комментария')
     evaluation = models.PositiveSmallIntegerField(verbose_name='Оценка', choices=EVALUATION_CHOICES, default=5)
-    comment_date = models.DateField(verbose_name='Дата комментария', auto_now_add=True)
+    comment_datetime = models.DateTimeField(verbose_name='Дата и время комментария', null=True, auto_now_add=True)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 

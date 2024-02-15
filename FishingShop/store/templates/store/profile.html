@@ -17,10 +17,11 @@
   <ul>
     <li>Контактное лицо: &nbsp;{% if user.last_name %} {{user.last_name}} {% endif %} 
       {% if user.first_name %}{{user.first_name}} {% endif %} 
-      {% if user.patronymic %}{{user.patronymic}} {% endif %} 
+      {% if user.patronymic %}{{user.patronymic}} {% endif %}
+        {% if not user.last_name and not user.first_name and not user.patronymic %} не заполнено {% endif %}
     </li>
-    <li>Номер телефона: &nbsp;{{user.phone_number}}  </li>
-    <li>Электронная почта: &nbsp;{{user.email}} </li>
+    <li>Номер телефона:  &nbsp;{{user.phone_number|default:"не заполнено"}} </li>
+    <li>Электронная почта: &nbsp;{{user.email|default:"не заполнено"}} </li>
   </ul>
   <a href="{% url 'edit_customer_profile' %}"><button class="edit_profile">Редактировать</button></a>
 </div>
@@ -58,18 +59,18 @@
         <th>Номер заказа </th>
         <th>Количество товаров, шт.</th>
         <th>Общая стоимость, &#8381;</th>
-        <th>Дата оформления</th>
         <th>Статус заказа</th>
+        <th>Дата и время статуса заказа</th>
       </tr>
     </thead>
     <tbody>
-      {% for order, values in orders.items %}
+      {% for order in orders %}
       <tr>
         <td><a class="table-orders__link" href="{% url 'order_tracking' order.id %}">{{order.id}}</a></td>
-        <td>{{values.0}}</td>
-        <td>{{values.1}}</td>
-        <td>{{order.buystep_set.all.0.step_begin_date}}</td>
+        <td>{{order.products_count}}</td>
+        <td>{{order.sum_products_price}}</td>
         <td>{{order.buystep_set.all.0.step}}</td>
+        <td>{{order.buystep_set.all.0.step_begin_datetime}}</td>
       </tr>
       {% endfor %}
     </tbody>

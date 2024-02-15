@@ -1,12 +1,9 @@
 from django import forms
-
 from .apps import user_registered
 from .models import Customer, Buy, Comment
-
 from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
 from django.forms.widgets import NumberInput
-from django.core import validators
 
 
 class BasketAddProductForm(forms.Form):
@@ -20,13 +17,6 @@ class BasketAddProductForm(forms.Form):
 class CustomerBuyForm(forms.ModelForm):
     """Форма данных клиента при оформлении заказа"""
 
-    # делаем незаполненные поля формы только для чтения
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields:
-            if getattr(self.instance, field) is not None:
-                self.fields[field].widget.attrs['readonly'] = True
-
     class Meta:
         model = Customer
         fields = ('first_name', 'last_name', 'patronymic', 'email', 'city', 'region',
@@ -35,9 +25,6 @@ class CustomerBuyForm(forms.ModelForm):
 
 class CustomerProfileDeliveryForm(forms.ModelForm):
     """Форма данных клиента в профиле для доставки """
-    postcode = forms.CharField(validators=[validators.RegexValidator(regex=r'^\d{6}$')],
-                               error_messages={'invalid': 'Ошибка ввода! Почтовый индекс должен состоять из 6-ти цифр'},
-                               label='Почтовый индекс')
 
     class Meta:
         model = Customer
@@ -47,9 +34,6 @@ class CustomerProfileDeliveryForm(forms.ModelForm):
 class CustomerProfileForm(forms.ModelForm):
     """Форма личных данных клиента в профиле"""
     email = forms.EmailField(required=True, label='Электронная почта')
-    phone_number = forms.CharField(
-        validators=[validators.RegexValidator(regex=r'^(\+7|7|8)?(\s|-|\()?[(]?\d{3}[)]?[\s|-]?\d{3}-?\d{2}-?\d{2}$')],
-        error_messages={'invalid': 'Неправильный формат номера телефона!'}, label='Номер телефона')
     send_messages = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'bool_field_profile_form'}),
                                        label='Высылать оповещения о новых товарах?',
                                        required=False)
@@ -120,4 +104,4 @@ class CustomerCommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        exclude = ('customer', 'product', 'comment_date')
+        exclude = ('customer', 'product', 'comment_datetime')

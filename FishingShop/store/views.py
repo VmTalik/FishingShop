@@ -7,7 +7,7 @@ from .forms import BasketAddProductForm, RegisterCustomerForm, BuyForm, \
     CustomerBuyForm, CustomerProfileDeliveryForm, CustomerProfileForm, CustomerCommentForm
 from django.http import Http404
 from django.views.generic import ListView, DetailView
-from django.db.models import Prefetch, Count, Avg
+from django.db.models import Prefetch, Count, Avg, Sum, F
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView, PasswordChangeView, LogoutView, PasswordResetView, \
@@ -207,7 +207,6 @@ class ProductView(DetailView):
             comment.customer = self.request.user
             comment.product = product
             comment.save()
-
         self.object = self.get_object()
         return self.render_to_response(context=self.get_context_data())
 
@@ -227,13 +226,11 @@ def basket_update_quantity(request, product_id):
                  range(1, 16)]  # максимальный стартовый выбор количества для всех товаров в корзине
     form = BasketAddProductForm(request.POST)
     form.quantity_choices(q_choices)
-
     if form.is_valid():
         cd = form.cleaned_data
         basket.add(product=product,
                    quantity=cd['quantity'],
                    update_quantity=cd['update'])
-
     return redirect('basket_detail')
 
 
@@ -267,14 +264,16 @@ def ordering(request):
             customer = customer_form.save(commit=False)
             customer.username = customer_initial.username
             customer.save()
-
             buy = buy_form.save(commit=False)
             buy.delivery_city = customer.city
             buy.delivery_region = customer.region
             buy.delivery_address = customer.delivery_address
-            buy.buyer_full_name = f'{customer.last_name} {customer.first_name} {customer.patronymic}'
+            buyer_last_name = customer.last_name if customer.last_name else ''
+            buyer_first_name = customer.first_name if customer.first_name else ''
+            buyer_patronymic = customer.patronymic if customer.patronymic else ''
+            buy.buyer_full_name = f'{buyer_last_name} {buyer_first_name} {buyer_patronymic}'
             buy.buyer_phone_number = customer.phone_number
-            buy.customer_id = customer.pk  # эту строку попробовать заменить на buy.customer_id = customer
+            buy.customer_id = customer.pk
             buy.save()
             step = Step()
             if not Step.objects.get(step_name='Заказ создан'):
@@ -309,20 +308,14 @@ def successful_ordering(request):
 def profile(request):
     """Функция представление - личный кабинет клиента"""
     customer = request.user
-    products_buy = (Buy.objects.filter(customer=customer)
-                    .prefetch_related('buyproduct_set')
-                    .prefetch_related(Prefetch('buystep_set',
-                                               queryset=BuyStep.objects.select_related('step')
-                                               .order_by('-step_begin_date'))))
-    orders = {}
-    for buy in products_buy:
-        products_count = 0
-        products_price = 0
-        for product in buy.buyproduct_set.all():
-            products_count += product.product_amount
-            products_price += product.product_price * product.product_amount
-        orders[buy] = (products_count, products_price)
-
+    orders = (Buy.objects.filter(customer=customer)
+              .prefetch_related('buyproduct_set')
+              .prefetch_related(Prefetch('buystep_set',
+                                         queryset=BuyStep.objects.select_related('step')))
+              .only('id')
+              .annotate(products_count=Sum('buyproduct__product_amount'))
+              .annotate(sum_products_price=Sum(F('buyproduct__product_price') * F('buyproduct__product_amount'))))
+    orders = sorted(orders, key=lambda i: i.buystep_set.all()[0].step_begin_datetime, reverse=True)
     profile_delivery_form = CustomerProfileDeliveryForm
     return render(request, 'store/profile.html',
                   {
@@ -337,22 +330,22 @@ def order_tracking(request, buy_id):
     products_bought = (BuyProduct.objects.filter(product_buy=buy_id)
                        .select_related('product__subcategory__category__fishing_season')
                        )
-    buy_steps = BuyStep.objects.filter(buy=buy_id).order_by('-step_begin_date').select_related('step')
+    buy_steps = BuyStep.objects.filter(buy=buy_id).order_by('-step_begin_datetime').select_related('step')
     buy = Buy.objects.select_related('customer').get(id=buy_id)
     total_products_price = 0
     for product in products_bought:
         total_products_price += product.product_price * product.product_amount
 
     return render(request, 'store/order_tracking.html',
-                  {'products_bought': products_bought,'buy_steps': buy_steps, 
-                  'buy_id': buy_id, 'buy':buy,
-                  'total_products_price': total_products_price})
+                  {'products_bought': products_bought, 'buy_steps': buy_steps,
+                   'buy_id': buy_id, 'buy': buy,
+                   'total_products_price': total_products_price})
 
 
 @login_required
 def edit_delivery_address_profile(request):
     """Функция представление - редактирование адреса доставки в личном кабинете клиента"""
-    customer = Customer.objects.get(pk=request.user.pk)
+    customer = request.user
     if request.method == "POST":
         delivery_address_profile_form = CustomerProfileDeliveryForm(request.POST, instance=customer)
         if delivery_address_profile_form.is_valid():
@@ -367,7 +360,7 @@ def edit_delivery_address_profile(request):
 @login_required
 def edit_customer_profile(request):
     """Функция представление - редактирование личных данных в личном кабинете клиента"""
-    customer = Customer.objects.get(pk=request.user.pk)
+    customer = request.user
     if request.method == "POST":
         customer_profile_form = CustomerProfileForm(request.POST, instance=customer)
         if customer_profile_form.is_valid():
