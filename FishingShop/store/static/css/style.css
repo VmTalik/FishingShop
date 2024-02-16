@@ -163,6 +163,7 @@
     transition: 0.5s;
     padding: 10px;
     background-color: white;
+    padding-bottom: 20px;
 }
 
 .main__new_product:hover, 
@@ -192,6 +193,7 @@
     font-size: 16px;
     margin-top: 5px;
     color: rgb(23, 23, 128);
+    line-height: 1.5;
 }
 
 .main__new_product p,
@@ -722,10 +724,11 @@
   font-size: 16px;
   font-style: italic;
   background: white;
-  width: 80%;
+  width: 95%;
   border-collapse: collapse;
   text-align: left;
   margin-top: 25px;
+  border-spacing: 50px;
 }
 
 .table-orders td {
@@ -742,6 +745,7 @@
 
 .table-orders th{
   color: #2F4F4F;
+  padding-bottom: 15px;
 }
 
 .completed_order-table {
@@ -785,6 +789,7 @@ border-radius: 8px;
 height: auto;
 width: 600px;
 margin-top: 30px;
+margin-bottom: 35px;
 margin-left: 50px;
 box-shadow: 4px 8px 14px #b9b4b4;
 }
