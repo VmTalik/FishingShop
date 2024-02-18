@@ -300,6 +300,34 @@ paramsCheckboxItemList.forEach(param => {
 
 });
 
+//вывод сообщения, если товаров по параметрам фильтрации не найдено
+const emptyProductList = document.querySelector('.empty-product-list'); //элемент сообщения
+
+let observer = new MutationObserver(mutations => {
+    mutations.forEach(mutation => {
+        flagMessage = true;
+        productListItems.forEach(item => {
+            if (item.style.display != 'none'){
+                flagMessage = false;
+            }
+        });
+        if (flagMessage){
+            emptyProductList.style.display = 'block';
+        } else {
+            emptyProductList.style.display = 'none';
+        }
+    });
+});
+
+productListItems.forEach(item => {
+    observer.observe(item,
+        {
+            attributes: true,
+            attributeFilter: ['style']
+        });
+});
+
+
 //сделаем невидимыми некоторые параметры товаров
 const productsParameters = document.querySelectorAll('.products-list__item-parameters');
 productsParameters.forEach(elem => {
@@ -345,4 +373,5 @@ productsSortSelect.addEventListener('change', () => {
     sortedArrayProductItems.forEach(element => {
         productList.appendChild(element);
     });
+    productList.appendChild(emptyProductList);
 });
