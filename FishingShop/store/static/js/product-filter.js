@@ -1,6 +1,6 @@
 class ProductFilter {
     constructor(productItems, filterList = [], FilterBy, rangeGap = 0, minRangeVal = 0, maxRangeVal = 10 ** 5) {
-        this.productItems = productItems; // элементы продукта
+        this.productItems = productItems; // элементы товаров
         if (filterList != []) {
             this.filterList = filterList; // массив названий фильтров
             this.otherFilterList = filterList.filter((el) => el != this.rangeFilterBy); //массив названий фильтров, кроме текущего 
@@ -238,7 +238,7 @@ class ProductFilter {
 }
 
 
-const productListItems = document.querySelectorAll('.products-list__item'); // элементы продукта
+const productListItems = document.querySelectorAll('.products-list__item'); // элементы товаров
 const filterList = ['price', 'manufacturer']; // массив названий фильтров
 
 const paramsCheckboxListItems = document.querySelectorAll('.checkboxName'); // названия чекбосов
@@ -330,6 +330,9 @@ productsSortSelect.addEventListener('change', () => {
         sortedArrayProductItems = arrayProductItems.sort((a, b) => +b.dataset.count_comments - +a.dataset.count_comments);
     }
     else if (productsSortSelect.value == 'rating') {
+        arrayProductItems.forEach(item => { 
+            item.dataset.rating = String(item.dataset.rating).replace(',', '.');
+        });
         sortedArrayProductItems = arrayProductItems.sort((a, b) => +b.dataset.rating - +a.dataset.rating);
     }
     else if (productsSortSelect.value == 'new') {

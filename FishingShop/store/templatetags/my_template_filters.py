@@ -27,7 +27,4 @@ def rus_plural(value, variants):
 
 @register.filter
 def formatted(value):
-    if type(value) is int:
-        return str(value)
-    if type(value) is float:
-        return str(value).replace(',', '.')
+    return str(value)

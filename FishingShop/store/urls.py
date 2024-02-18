@@ -4,6 +4,7 @@ from .views import index, product_categories, manufacturers, basket_detail, prod
     ProductView, CustomerLoginView, ChangeCustomerPasswordView, RegisterCustomerView, \
     RegisterDoneView, customer_activate, DeleteCustomerAccountView, CustomerLogoutView, ResetCustomerPasswordView, \
     ResetDoneCustomerPasswordView, ResetConfirmCustomerPasswordView, ResetCompleteCustomerPasswordView
+from django.views.decorators.cache import never_cache
 
 urlpatterns = [
     path('accounts/register/done/', RegisterDoneView.as_view(), name='register_done'),
@@ -35,8 +36,8 @@ urlpatterns = [
     path('info/<str:page>/', views.other_page, name='other'),
     path('<slug:fishing_season_slug>/<slug:category_slug>/<slug:subcategory_slug>/<slug:product_slug>/',
          ProductView.as_view(), name='product'),
-    path('<slug:fishing_season_slug>/<slug:category_slug>/<slug:subcategory_slug>/', ProductsView.as_view(),
-         name='products'),
+    path('<slug:fishing_season_slug>/<slug:category_slug>/<slug:subcategory_slug>/',
+         never_cache(ProductsView.as_view()), name='products'),
     path('<slug:fishing_season_slug>/<slug:category_slug>/', product_subcategories, name='product_subcategories'),
     path('<slug:fishing_season_slug>/', product_categories, name='product_categories'),
     path('', index, name='index')
