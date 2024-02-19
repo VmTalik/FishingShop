@@ -845,6 +845,7 @@ height: 80px;
 .product-comments__comment .comment_signature{
     font-style: italic;
     display: inline-block;
+    min-width: 100px;
 }
 
 .product-comments__comment .comment_date{
@@ -863,6 +864,10 @@ height: 80px;
 
 .product-comments__comment .comment_header {
     font-weight: bold;
+}
+
+.product-comments__comment .comment_text {
+    line-height: 1.5;
 }
 
 /*рейтинги к товарам */

@@ -101,8 +101,8 @@
             <p class="comment_rating" data-comment_rating="{{comment.evaluation}}">
                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
             </p>
-            <p class="comment_header">{{comment.title}}</p>
-            <p class="comment_text">{{comment.comment_text}}</p>
+            <p class="comment_header">{% if comment.title %}{{comment.title}}{% endif %}</p>
+            <p class="comment_text">{% if comment.comment_text %}{{comment.comment_text}}{% endif %}</p>
         </div>
         {% endfor %}
         {% else %}

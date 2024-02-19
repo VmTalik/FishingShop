@@ -181,7 +181,8 @@ class ProductView(DetailView):
                 .prefetch_related('additional_product_image')
                 .prefetch_related(Prefetch('comment_set',
                                            queryset=Comment.objects.all()
-                                           .select_related('customer')))
+                                           .select_related('customer')
+                                           .order_by('-comment_datetime')))
                 )
 
     def get_context_data(self, **kwargs):
