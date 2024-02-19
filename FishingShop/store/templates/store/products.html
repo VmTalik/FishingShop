@@ -38,7 +38,7 @@
         {% for product in current_products_queryset %}
         <div class="products-list__item product-list__item" data-price="{{product.price}}" 
         data-count_buyproduct="{{product.count_buyproduct}}" data-count_comments="{{product.count_comments}}"
-        data-rating="{{product.avg_evaluation|default:0}}" data-supply_date="{{product.supply_date}}">
+        data-rating="{{product.avg_evaluation|default:0}}" data-supply_date="{{product.supply_date|date:'c'}}">
             <a href="{{product.get_absolute_url}}">
                 <img class="image-product" src="{{product.image.url}}">
                 <div class="products__item-name">{{product.name}}</div>
