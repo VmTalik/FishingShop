@@ -44,6 +44,9 @@
                 <div class="products__item-name">{{product.name}}</div>
             </a>
             <div class="products-list__item-parameters">
+                <div class="products__item-warehouse product__item-warehouse">
+                    <span>{{product.warehouse.product_availability}}</span>
+                </div>
                 <div class="products__item-manufacturer product__item-manufacturer">
                     Производитель: <span>{{product.manufacturer.manufacturer_name}}</span>
                 </div>
@@ -89,9 +92,15 @@
             </div>
             <div class="products_basket">
                 {% if product.pk not in basket_products_ids_list %}
+                {% with pa=product.warehouse.product_availability %}
+                {% if pa == 'В наличии' or pa == 'Есть в наличии' or pa == 'Есть на складе'%}
                 <a href="{% url 'basket_add' product_id=product.pk %}">
                     <button class="add_to_basket">В корзину</button>
                 </a>
+                {% else %}
+                <div class="add_to_basket_impossible">{{pa}}</div>
+                {% endif %}
+                {% endwith %}
                 {% else %}
                 <a href="{% url 'basket_detail' %}">
                     <button class="already_in_basket">В корзине</button>
@@ -127,7 +136,16 @@
                 <input type="range" class="price-range-max range-max" min="{{min_price}}" max="{{max_price}}" value="{{max_price}}">
             </div>
         </div>
-
+        <div class="products-filter__warehouse product-filter__warehouse">
+            {% if product_availability|length > 1%}
+            <p>Наличие товаров</p>
+            <div class="checkboxes">
+                {% for product_availability_item in product_availability %}
+                <label class="warehouse-label"><input type="checkbox"><span>{{product_availability_item}}</span></label>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
         <div class="products-filter__manufacturer product-filter__manufacturer">
             <p>Производитель</p>
             <div class="checkboxes">

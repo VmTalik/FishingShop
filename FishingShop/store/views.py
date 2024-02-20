@@ -90,6 +90,7 @@ class ProductsView(ListView):
             subcategory__category__fishing_season__fishing_season_slug=self.kwargs['fishing_season_slug'])
                 .select_related('subcategory__category__fishing_season')
                 .select_related('manufacturer')
+                .select_related('warehouse')
                 .prefetch_related(Prefetch('productparametervalue_set',
                                            queryset=ProductParameterValue.objects.all()
                                            .select_related('product_param')
@@ -103,7 +104,7 @@ class ProductsView(ListView):
                 .annotate(count_buyproduct=Count('buyproduct', distinct=True))
                 .annotate(count_comments=Count('comment', distinct=True))
                 .annotate(avg_evaluation=Round(Avg('comment__evaluation'), 2))
-                .order_by('-count_buyproduct')
+                .order_by('warehouse__id', '-count_buyproduct')
                 )
 
     def get_context_data(self, **kwargs):
@@ -116,7 +117,9 @@ class ProductsView(ListView):
         context['min_price'] = context['current_products_queryset'][0].price
         context['max_price'] = context['current_products_queryset'][0].price
         context['products_evaluations'] = {}  # оценки товаров (среднее знач. оценок товара и количество оценок)
+        context['product_availability'] = set() # наличие товаров 
         for product in context['current_products_queryset']:
+            context['product_availability'].add(product.warehouse)
             product_comments = product.comment_set.all()  # Все отзывы к товару
             if product_comments:
                 product_evaluations_sum = 0  # сумма оценок товара
@@ -155,6 +158,7 @@ class ProductsView(ListView):
                         context['products_params_min_max'][product_param][0] = param_value
                     if context['products_params_min_max'][product_param][1] < param_value:
                         context['products_params_min_max'][product_param][1] = param_value
+        context['product_availability'] = sorted(context['product_availability'], key=lambda i: i.id)
         context['product_param_filter_str'] = [i.product_param_name for i in context['products_params_str']]
         return context
 
@@ -172,6 +176,7 @@ class ProductView(DetailView):
             subcategory__category__fishing_season__fishing_season_slug=self.kwargs['fishing_season_slug'])
                 .select_related('subcategory__category__fishing_season')
                 .select_related('manufacturer')
+                .select_related('warehouse')
                 .prefetch_related(Prefetch('productparametervalue_set',
                                            queryset=ProductParameterValue.objects.all()
                                            .select_related('product_param')

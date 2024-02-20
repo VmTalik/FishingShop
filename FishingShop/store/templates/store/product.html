@@ -39,9 +39,15 @@
             <div class="product-price">{{product.price}} &#8381;</div>
             <div class="product-basket">
                 {% if product.pk not in basket_products_ids_list %}
+                {% with pa=product.warehouse.product_availability %}
+                {% if pa == 'В наличии' or pa == 'Есть в наличии' or pa == 'Есть на складе'%}
                 <a href="{% url 'basket_add' product_id=product.pk %}">
                     <button class="product-add_to_basket">В корзину</button>
                 </a>
+                {% else %}
+                <div class="add_to_basket_impossible">{{pa}}</div>
+                {% endif %}
+                {% endwith %}
                 {% else %}
                 <a href="{% url 'basket_detail' %}">
                     <button class="product-already_in_basket">В корзине</button>

@@ -428,13 +428,15 @@
 }
 
 .product-filter__manufacturer,
+.product-filter__warehouse,
 .product-filter__checkbox {
     margin-left: 10px;
     margin-right: 10px;
-    margin-bottom: 50px;
+    margin-bottom: 35px;
 }
 
 .product-filter__manufacturer .checkboxes, 
+.product-filter__warehouse .checkboxes,
 .product-filter__checkbox .checkboxes {
     display: flex;
     flex-direction: column;
@@ -478,6 +480,10 @@
     transform: scale(1.07);
     transition: 0.5s;
     box-shadow: 0 4px 16px #8dc492;
+}
+
+.add_to_basket_impossible {
+    color: rgb(173, 17, 17);
 }
 
 .basket__product_image {

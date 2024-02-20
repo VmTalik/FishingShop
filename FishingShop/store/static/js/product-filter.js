@@ -239,7 +239,7 @@ class ProductFilter {
 
 
 const productListItems = document.querySelectorAll('.products-list__item'); // элементы товаров
-const filterList = ['price', 'manufacturer']; // массив названий фильтров
+const filterList = ['price', 'warehouse', 'manufacturer']; // массив названий фильтров
 
 const paramsCheckboxListItems = document.querySelectorAll('.checkboxName'); // названия чекбосов
 const paramsRangeListItems = document.querySelectorAll('.rangeName'); // названия фильтров диапазонов
@@ -272,6 +272,10 @@ const max_price = document.querySelector('.price-range-max').value;
 //фильтр товаров по цене (учитывая остальные фильтры)
 const productFilterPrice = new ProductFilter(productListItems, filterList, { rangeFilterBy: 'price' }, 0, min_price, max_price);
 productFilterPrice.runFilter();
+
+//фильтр товаров по наличию товаров (учитывая остальные фильтры)
+const productFilterWarehouse = new ProductFilter(productListItems, filterList, { checkboxFilterBy: 'warehouse' });
+productFilterWarehouse.runFilter();
 
 //фильтр товаров по производителю (учитывая остальные фильтры)
 const productFilterManufacturer = new ProductFilter(productListItems, filterList, { checkboxFilterBy: 'manufacturer' });
@@ -331,6 +335,7 @@ productListItems.forEach(item => {
 //сделаем невидимыми некоторые параметры товаров
 const productsParameters = document.querySelectorAll('.products-list__item-parameters');
 productsParameters.forEach(elem => {
+    elem.children[0].style.display = 'none'; //скрываем строку наличия товара
     for (let i = 4; i < elem.children.length - 1; i++){ //с 5-го по предпоследний, пар-ры на карточках товаров скрываем
         elem.children[i].style.display = 'none';
     }
