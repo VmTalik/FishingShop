@@ -317,7 +317,8 @@ def profile(request):
     orders = (Buy.objects.filter(customer=customer)
               .prefetch_related('buyproduct_set')
               .prefetch_related(Prefetch('buystep_set',
-                                         queryset=BuyStep.objects.select_related('step')))
+                                         queryset=BuyStep.objects.select_related('step')
+                                         .order_by('-step_begin_datetime')))
               .only('id')
               .annotate(products_count=Sum('buyproduct__product_amount'))
               .annotate(sum_products_price=Sum(F('buyproduct__product_price') * F('buyproduct__product_amount'))))
